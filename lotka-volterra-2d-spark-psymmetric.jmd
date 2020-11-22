@@ -1,0 +1,7 @@
+# Lotka-Volterra 2d with SPARK Integrators
+
+## Symmetric Projection
+
+```julia
+run_list_vspark_symmetric_projection(lotka_volterra_2d_idae())
+```

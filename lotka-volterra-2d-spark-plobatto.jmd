@@ -1,0 +1,25 @@
+# Lotka-Volterra 2d with SPARK Integrators
+
+## Lobatto-IIIA-IIIB Projection • Definition 1
+
+```julia
+run_list_vspark_lobatto_IIIAIIIB_projection(lotka_volterra_2d_idae())
+```
+
+## Lobatto-IIIB-IIIA Projection • Definition 1
+
+```julia
+run_list_vspark_lobatto_IIIBIIIA_projection(lotka_volterra_2d_idae())
+```
+
+## Lobatto-IIIA-IIIB Projection • Definition 2
+
+```julia
+run_list_vspark_modified_lobatto_IIIAIIIB_projection(lotka_volterra_2d_idae())
+```
+
+## Lobatto-IIIB-IIIA Projection • Definition 2
+
+```julia
+run_list_vspark_modified_lobatto_IIIBIIIA_projection(lotka_volterra_2d_idae())
+```

@@ -1,0 +1,13 @@
+# Lotka-Volterra 2d with SPARK Integrators
+
+## Internal Projection • Definition 1
+
+```julia
+run_list_vspark_internal_projection(lotka_volterra_2d_idae())
+```
+
+## Internal Projection • Definition 2
+
+```julia
+run_list_vspark_modified_internal_projection(lotka_volterra_2d_idae())
+```

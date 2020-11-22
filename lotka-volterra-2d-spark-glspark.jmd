@@ -1,0 +1,7 @@
+# Lotka-Volterra 2d with SPARK Integrators
+
+## Gauss-Legendre SPARK Methods
+
+```julia
+run_list_spark_glrk(lotka_volterra_2d_idae_spark())
+```
