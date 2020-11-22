@@ -36,6 +36,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/michakraus/papers-spark-methods-for-degenerate-lagrangian-systems.jl",
+    repo="github.com/michakraus/paper-spark-methods-for-degenerate-lagrangian-systems",
     devbranch="main"
 )
