@@ -1,0 +1,13 @@
+# Massless Charged Particle with SPARK Integrators
+
+## Internal Projection • Definition 1
+
+```julia
+run_list_vspark_internal_projection(massless_charged_particle_idae())
+```
+
+## Internal Projection • Definition 2
+
+```julia
+run_list_vspark_modified_internal_projection(massless_charged_particle_idae())
+```

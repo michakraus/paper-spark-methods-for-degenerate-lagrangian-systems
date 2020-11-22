@@ -1,0 +1,13 @@
+# Massless Charged Particle with SPARK Integrators
+
+## Gauss-Legendre VPRK Methods
+
+```julia
+#run_list_spark_glvprk(massless_charged_particle_idae_spark())
+run_list(massless_charged_particle_idae_spark(), :TableauSPARKGLVPRK, (
+        ( TableauSPARKGLVPRK(1),         "spark_glvprk1",    10000 ),
+        ( TableauSPARKGLVPRK(2),         "spark_glvprk2",    10000 ),
+        ( TableauSPARKGLVPRK(3),         "spark_glvprk3",    17500 ),
+        ( TableauSPARKGLVPRK(4),         "spark_glvprk4",    20000 ),
+    ))
+```
