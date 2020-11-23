@@ -135,10 +135,13 @@ end
 
 
 function _plot_figure_md(file, name, filename)
-    if isfile(filename)
+    # if isfile(filename)
         show(file, "text/markdown", Markdown.parse("![$name]($filename)"))
         _linebreak(file)
-    end
+    # else
+    #     show(stdout, "text/markdown", Markdown.parse("ERROR: Plot output $filename does not exist!"))
+    #     @warn("Plot output $filename does not exist!")
+    # end
 end
 
 
