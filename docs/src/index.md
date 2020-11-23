@@ -66,3 +66,30 @@ b^{q}_{i} &= b^{p}_{i} && i = 1, \, ... , \, s ,
 ## References
 
 * Michael Kraus. SPARK Methods for Degenerate Lagrangian Systems.
+
+If you use the integrators described in the article above, please cite GeometricIntegrators.jl as
+
+```
+@misc{Kraus:2020:GeometricIntegrators,
+  title={GeometricIntegrators.jl: A Julia library of geometric integrators for ordinary differential equations and differential algebraic equations},
+  author={Kraus, Michael},
+  year={2020},
+  howpublished={\url{https://github.com/JuliaGNI/GeometricIntegrators.jl}},
+  doi={10.5281/zenodo.3648325}
+}
+```
+
+If you use the figures or implementations provided here, please cite this repository as
+
+```
+@misc{Kraus:2020:SPARKMethodsRepo,
+  title={Companion Repository to ``{SPARK} Methods for Degenerate {L}agrangian Systems''},
+  author={Kraus, Michael},
+  year={2020},
+  month={11},
+  howpublished={\url{https://github.com/michakraus/paper-spark-methods-for-degenerate-lagrangian-systems}},
+  doi={10.5281/zenodo.4285904}
+}
+```
+
+All figures are licensed under the Creative Commons [CC BY-NC-SA 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
