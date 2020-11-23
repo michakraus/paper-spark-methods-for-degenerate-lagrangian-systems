@@ -11,6 +11,7 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Integrators" => "integrators.md",
         "Tableaus" => "tableaus.md",
 
         "Lotka-Volterra 2d" => [
