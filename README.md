@@ -2,7 +2,7 @@
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://michakraus.github.io/paper-spark-methods-for-degenerate-lagrangian-systems/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://michakraus.github.io/paper-spark-methods-for-degenerate-lagrangian-systems/dev)
-[![DOI](https://zenodo.org/badge/310285877.svg)](https://zenodo.org/badge/latestdoi/310285877)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.4285904.svg)](https://doi.org/10.5281/zenodo.4285904)
 
 This packages serves to document the examples from the paper *SPARK Methods for Degenerate Lagrangian Systems*.
 
@@ -27,7 +27,7 @@ If you use the figures or implementations provided here, please cite this reposi
   year={2020},
   month={11},
   howpublished={\url{https://github.com/michakraus/paper-spark-methods-for-degenerate-lagrangian-systems}},
-  doi={10.5281/zenodo.4285905}
+  doi={10.5281/zenodo.4285904}
 }
 ```
 
