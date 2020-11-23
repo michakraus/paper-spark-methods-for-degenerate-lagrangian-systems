@@ -17,6 +17,18 @@ The corresponding plots can be found in the [documentation](https://michakraus.g
 > 
 > In this work, existing variational partitioned Runge--Kutta methods for degenerate Lagrangians and SPARK methods for index-two differential-algebraic equations are generalised to fit a common framework. It is shown how these methods fail to either preserve the primary constraint or the noncanonical symplectic structure of the equations. A new family of SPARK methods, projecting on the primary constraint, is presented and conditions for the conservation of the noncanonical symplectic structure are derived. Numerical experiments highlight the favourable properties of the proposed integrators.
 
+If you use the integrators described in the article above, please cite GeometricIntegrators.jl as
+
+```
+@misc{Kraus:2020:GeometricIntegrators,
+  title={GeometricIntegrators.jl: A Julia library of geometric integrators for ordinary differential equations and differential algebraic equations},
+  author={Kraus, Michael},
+  year={2020},
+  howpublished={\url{https://github.com/JuliaGNI/GeometricIntegrators.jl}},
+  doi={10.5281/zenodo.3648325}
+}
+```
+
 If you use the figures or implementations provided here, please cite this repository as
 
 ```
