@@ -3,7 +3,8 @@ using Weave
 
 Weave.set_chunk_defaults!(:echo => false, :results => "raw")
 
-include("src/lotka-volterra-2d.jl")
+include("../src/lotka-volterra-2d.jl")
+
 
 weave("weave/lotka-volterra-2d-spark-glvprk.jmd",
          out_path = "build/lotka-volterra-2d-spark",

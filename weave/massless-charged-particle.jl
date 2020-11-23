@@ -3,7 +3,8 @@ using Weave
 
 Weave.set_chunk_defaults!(:echo => false, :results => "raw")
 
-include("src/massless-charged-particle.jl")
+include("../src/massless-charged-particle.jl")
+
 
 weave("weave/massless-charged-particle-spark-glvprk.jmd",
          out_path = "build/massless-charged-particle-spark",
