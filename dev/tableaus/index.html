@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tableaus · SPARK Methods for Degenerate Lagrangian Systems</title><link rel="canonical" href="https://michakraus.github.io/papers-spark-methods-for-degenerate-lagrangian-systems/tableaus/"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">SPARK Methods for Degenerate Lagrangian Systems</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Tableaus</a><ul class="internal"><li><a class="tocitem" href="#Variational-Partitioned-Runge-Kutta-Methods"><span>Variational Partitioned Runge-Kutta Methods</span></a></li><li><a class="tocitem" href="#Gauss-Legendre-SPARK-Methods"><span>Gauss-Legendre SPARK Methods</span></a></li><li><a class="tocitem" href="#Lobatto-SPARK-Methods"><span>Lobatto SPARK Methods</span></a></li><li><a class="tocitem" href="#Internal-Projection-•-Definition-1"><span>Internal Projection • Definition 1</span></a></li><li><a class="tocitem" href="#Internal-Projection-•-Definition-2"><span>Internal Projection • Definition 2</span></a></li><li><a class="tocitem" href="#Lobatto-IIIA-IIIB-Projection-•-Definition-1"><span>Lobatto-IIIA-IIIB Projection • Definition 1</span></a></li><li><a class="tocitem" href="#Lobatto-IIIB-IIIA-Projection-•-Definition-1"><span>Lobatto-IIIB-IIIA Projection • Definition 1</span></a></li><li><a class="tocitem" href="#Lobatto-IIIA-IIIB-Projection-•-Definition-2"><span>Lobatto-IIIA-IIIB Projection • Definition 2</span></a></li><li><a class="tocitem" href="#Lobatto-IIIB-IIIA-Projection-•-Definition-2"><span>Lobatto-IIIB-IIIA Projection • Definition 2</span></a></li><li><a class="tocitem" href="#Midpoint-Projection-•-Definition-1"><span>Midpoint Projection • Definition 1</span></a></li><li><a class="tocitem" href="#Midpoint-Projection-•-Definition-2"><span>Midpoint Projection • Definition 2</span></a></li><li><a class="tocitem" href="#Midpoint-Projection-•-Verification"><span>Midpoint Projection • Verification</span></a></li><li><a class="tocitem" href="#Symmetric-Projection"><span>Symmetric Projection</span></a></li></ul></li><li><span class="tocitem">Lotka-Volterra 2d</span><ul><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-glvprk/">Gauss-Legendre VPRK Methods</a></li><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-glspark/">Gauss-Legendre SPARK Methods</a></li><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-lobspark/">Gauss-Lobatto SPARK Methods</a></li><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-pinternal/">Internal Stage Projection</a></li><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-plobatto/">Lobatto-IIIA-IIIB Projection</a></li><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-pmidpoint/">Midpoint Projection</a></li><li><a class="tocitem" href="../lotka-volterra-2d/lotka-volterra-2d-spark-psymmetric/">Symmetric Projection</a></li></ul></li><li><span class="tocitem">Massless Charged Particle</span><ul><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-glvprk/">Gauss-Legendre VPRK Methods</a></li><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-glspark/">Gauss-Legendre SPARK Methods</a></li><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-lobspark/">Gauss-Lobatto SPARK Methods</a></li><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-pinternal/">Internal Stage Projection</a></li><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-plobatto/">Lobatto-IIIA-IIIB Projection</a></li><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-pmidpoint/">Midpoint Projection</a></li><li><a class="tocitem" href="../massless-charged-particle/massless-charged-particle-spark-psymmetric/">Symmetric Projection</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Tableaus</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Tableaus</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/michakraus/paper-spark-methods-for-degenerate-lagrangian-systems/blob/master/docs/src/tableaus.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Tableaus"><a class="docs-heading-anchor" href="#Tableaus">Tableaus</a><a id="Tableaus-1"></a><a class="docs-heading-anchor-permalink" href="#Tableaus" title="Permalink"></a></h1><h2 id="Variational-Partitioned-Runge-Kutta-Methods"><a class="docs-heading-anchor" href="#Variational-Partitioned-Runge-Kutta-Methods">Variational Partitioned Runge-Kutta Methods</a><a id="Variational-Partitioned-Runge-Kutta-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Variational-Partitioned-Runge-Kutta-Methods" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauSPARKGLVPRK" href="#GeometricIntegrators.Tableaus.TableauSPARKGLVPRK"><code>GeometricIntegrators.Tableaus.TableauSPARKGLVPRK</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Tableau for Variational Gauss-Legendre method with s stages.</p></div></section></article><h2 id="Gauss-Legendre-SPARK-Methods"><a class="docs-heading-anchor" href="#Gauss-Legendre-SPARK-Methods">Gauss-Legendre SPARK Methods</a><a id="Gauss-Legendre-SPARK-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Gauss-Legendre-SPARK-Methods" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauSPARKGLRK" href="#GeometricIntegrators.Tableaus.TableauSPARKGLRK"><code>GeometricIntegrators.Tableaus.TableauSPARKGLRK</code></a> — <span class="docstring-category">Function</span></header><section><div><p>SPARK tableau for Gauss-Legendre Runge-Kutta method with s stages.</p></div></section></article><h2 id="Lobatto-SPARK-Methods"><a class="docs-heading-anchor" href="#Lobatto-SPARK-Methods">Lobatto SPARK Methods</a><a id="Lobatto-SPARK-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Lobatto-SPARK-Methods" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauSPARKLobatto" href="#GeometricIntegrators.Tableaus.TableauSPARKLobatto"><code>GeometricIntegrators.Tableaus.TableauSPARKLobatto</code></a> — <span class="docstring-category">Function</span></header><section><div><p>SPARK tableau for Gauss-Lobatto methods.</p></div></section></article><h2 id="Internal-Projection-•-Definition-1"><a class="docs-heading-anchor" href="#Internal-Projection-•-Definition-1">Internal Projection • Definition 1</a><a id="Internal-Projection-•-Definition-1-1"></a><a class="docs-heading-anchor-permalink" href="#Internal-Projection-•-Definition-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKInternalProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKInternalProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKInternalProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>. Use the same tableaus for <span>$\tilde{a}^{1}$</span> and <span>$\tilde{a}^{3}$</span>, so that <span>$\tilde{s} = s$</span>, as well as</p><div>\[\begin{aligned}
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{1} \\
+&amp; \vdots \\
+&amp; \tfrac{1}{2} b^{1} \\
+\hline
+a^{2} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{3} \\
+&amp; \vdots \\
+&amp; \tfrac{1}{2} b^{3} \\
+\hline
+a^{4} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{1} \\
+c^{1} &amp; \vdots \\
+&amp; \tfrac{1}{2} b^{1} \\
+\hline
+\tilde{a}^{2} &amp; \tfrac{1}{2} (1 + R(\infty)) \, b^{1} \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{3} \\
+c^{3} &amp; \vdots \\
+&amp; \tfrac{1}{2} b^{3} \\
+\hline
+\tilde{a}^{4} &amp; \tfrac{1}{2} (1 + R(\infty)) \, b^{3} \\
+\end{array}
+\end{aligned}\]</div><p>Set <span>$\omega = [0, ..., 0, 1]$</span> and</p><div>\[\delta_{ij} = \begin{cases}
++1 &amp; j = i , \\
+-1 &amp; j = \tilde{s} , \\
+ 0 &amp; \text{else} ,
+\end{cases}\]</div><p>so that <span>$\Lambda_{1} = \Lambda_{2} = ... = \Lambda_{\tilde{s}}$</span>.</p><p>This methods is constructed to satisfy the constraint on the projective stages, <span>$\phi(\tilde{Q}_{n,i}, \tilde{P}_{n,i}) = 0$</span> for <span>$i = 1, \, ..., \, \tilde{s}$</span>. Note, however, that it violates the symplecticity conditions <span>$b^{1}_{i} b^{4}_{j} = b^{1}_{i} a^{4}_{ij} + b^{4}_{j} \tilde{a}^{1}_{ji}$</span> and <span>$b^{2}_{i} b^{3}_{j} = b^{2}_{i} \tilde{a}^{3}_{ij} + b^{3}_{j} a^{2}_{ji}$</span>.</p></div></section></article><h2 id="Internal-Projection-•-Definition-2"><a class="docs-heading-anchor" href="#Internal-Projection-•-Definition-2">Internal Projection • Definition 2</a><a id="Internal-Projection-•-Definition-2-1"></a><a class="docs-heading-anchor-permalink" href="#Internal-Projection-•-Definition-2" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKModifiedInternalProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKModifiedInternalProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKModifiedInternalProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>, and set</p><div>\[\begin{aligned}
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{1} \\
+&amp; \vdots \\
+&amp; \tfrac{1}{2} b^{1} \\
+\hline
+a^{2} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{4} \\
+&amp; \vdots \\
+&amp; \tfrac{1}{2} b^{4} \\
+\hline
+a^{4} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{1} \\
+c^{1} &amp; \vdots \\
+&amp; \tfrac{1}{2} b^{1} \\
+\hline
+\tilde{a}^{2} &amp; \tfrac{1}{2} (1 + R(\infty)) \, b^{1} \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} b^{3} \\
+c^{3} &amp; \vdots \\
+&amp; \tfrac{1}{2} b^{3} \\
+\hline
+\tilde{a}^{4} &amp; \tfrac{1}{2} (1 + R(\infty)) \, b^{3} \\
+\end{array}
+\end{aligned}\]</div><p>Note that by this definition <span>$\tilde{s} = s$</span>. The coefficients <span>$\tilde{a}^{1}$</span> and <span>$\tilde{a}^{3}$</span> are determined by the (modified) symplecticity conditions, specifically <span>$a^{4}_{ij} = b^{3}_{j} ( b^{1}_{i} - \tilde{a}^{1}_{ji}) / b^{1}_{i}$</span> and <span>$a^{2}_{ij} = b^{1}_{j} ( b^{3}_{i} - \tilde{a}^{3}_{ji} ) / b^{3}_{i}$</span>, where <span>$b^{2}$</span> has been replaced with <span>$b^{1}$</span> and <span>$b^{4}$</span> with <span>$b^{3}$</span>, respectively. Set <span>$\omega = [0, ..., 0, 1]$</span> and</p><div>\[\delta_{ij} = \begin{cases}
++1 &amp; j = i , \\
+-1 &amp; j = \tilde{s} , \\
+ 0 &amp; \text{else} ,
+\end{cases}\]</div><p>so that <span>$\Lambda_{1} = \Lambda_{2} = ... = \Lambda_{\tilde{s}}$</span>.</p><p>Note that this method satisfies the symplecticity conditions <span>$b^{1}_{i} b^{4}_{j} = b^{1}_{i} a^{4}_{ij} + b^{4}_{j} \tilde{a}^{1}_{ji}$</span> and <span>$b^{2}_{i} b^{3}_{j} = b^{2}_{i} \tilde{a}^{3}_{ij} + b^{3}_{j} a^{2}_{ji}$</span> only if <span>$R(\infty) = 1$</span> due to the definitions of <span>$b^{2}$</span> and <span>$b^{4}$</span>. Moreover, it does usually not satisfy the constraint on the projective stages, <span>$\phi(\tilde{Q}_{n,i}, \tilde{P}_{n,i}) = 0$</span> for <span>$i = 1, \, ..., \, \tilde{s}$</span>, exactly, but only approximately with bounded error, thus implying a residual in the symplecticity equation even if <span>$R(\infty) = 1$</span>.</p></div></section></article><h2 id="Lobatto-IIIA-IIIB-Projection-•-Definition-1"><a class="docs-heading-anchor" href="#Lobatto-IIIA-IIIB-Projection-•-Definition-1">Lobatto-IIIA-IIIB Projection • Definition 1</a><a id="Lobatto-IIIA-IIIB-Projection-•-Definition-1-1"></a><a class="docs-heading-anchor-permalink" href="#Lobatto-IIIA-IIIB-Projection-•-Definition-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKLobIIIAIIIBProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKLobIIIAIIIBProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKLobIIIAIIIBProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>. For the projection, choose the Lobatto-IIIA and IIIB tableaus with <span>$\tilde{s} = 2$</span> stages for <span>$(\tilde{a}^{4}, b^{4})$</span> and <span>$(\tilde{a}^{2}, b^{2})$</span>, respectively, and choose <span>$\tilde{a}^{1}$</span> and <span>$\tilde{a}^{3}$</span> such that the projective stages correspond to the initial condition and the solution, i.e.,</p><div>\[\begin{aligned}
+\begin{array}{c|cc}
+0 &amp; 0 \\
+1 &amp; b^{1} \\
+\hline
+\tilde{a}^{1} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+0 &amp; \tfrac{1}{2} &amp; 0 \\
+1 &amp; \tfrac{1}{2} &amp; 0 \\
+\hline
+\tilde{a}^{2} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+0 &amp; 0 \\
+1 &amp; b^{3} \\
+\hline
+\tilde{a}^{3} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+0 &amp; 0 &amp; 0 \\
+1 &amp; \tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{4} &amp; \\
+\end{array}
+\end{aligned}\]</div><p>and compute <span>$a^{2}$</span> and <span>$a^{4}$</span> by the symplecticity conditions, that is <span>$a^{2}_{ij} = b^{2}_{j} ( b^{3}_{i} - \tilde{a}^{3}_{ji} ) / b^{3}_{i}$</span> and <span>$a^{4}_{ij} = b^{4}_{j} ( b^{1}_{i} - \tilde{a}^{1}_{ji}) / b^{1}_{i}$</span>. Finally choose <span>$\omega = [0, 0, 1]$</span> and <span>$\delta = [-1, R_{\infty}]$</span>, implying that <span>$\rho = 1$</span>. By construction, this method satisfies all symplecticity conditions, but the constraint on the projection stages, <span>$\phi(\tilde{Q}_{n,i}, \tilde{P}_{n,i}) = 0$</span> for <span>$i = 1, \, ..., \, \tilde{s}$</span>, is not satisfied exactly, but only approximately, although with bounded error.</p></div></section></article><h2 id="Lobatto-IIIB-IIIA-Projection-•-Definition-1"><a class="docs-heading-anchor" href="#Lobatto-IIIB-IIIA-Projection-•-Definition-1">Lobatto-IIIB-IIIA Projection • Definition 1</a><a id="Lobatto-IIIB-IIIA-Projection-•-Definition-1-1"></a><a class="docs-heading-anchor-permalink" href="#Lobatto-IIIB-IIIA-Projection-•-Definition-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKLobIIIBIIIAProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKLobIIIBIIIAProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKLobIIIBIIIAProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>This methods is the same as <code>TableauVSPARKLobIIIAIIIBProjection</code>, except for using Lobatto-IIIA and IIIB tableaus with <span>$\tilde{s} = 2$</span> stages for <span>$(\tilde{a}^{2}, b^{2})$</span>, and <span>$(\tilde{a}^{4}, b^{4})$</span> respectively, instead of the other way around.</p></div></section></article><h2 id="Lobatto-IIIA-IIIB-Projection-•-Definition-2"><a class="docs-heading-anchor" href="#Lobatto-IIIA-IIIB-Projection-•-Definition-2">Lobatto-IIIA-IIIB Projection • Definition 2</a><a id="Lobatto-IIIA-IIIB-Projection-•-Definition-2-1"></a><a class="docs-heading-anchor-permalink" href="#Lobatto-IIIA-IIIB-Projection-•-Definition-2" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKModifiedLobIIIAIIIBProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKModifiedLobIIIAIIIBProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKModifiedLobIIIAIIIBProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>. For the projection, choose the Lobatto-IIIA and IIIB tableaus with <span>$\tilde{s} = 2$</span> stages for <span>$(\tilde{a}^{4}, b^{4})$</span> and <span>$(\tilde{a}^{2}, b^{2})$</span>, respectively.</p><p>The coefficients <span>$\tilde{a}^{1}$</span> and <span>$\tilde{a}^{3}$</span> are determined by the relations</p><div>\[\begin{aligned}
+\sum \limits_{j=1}^{s} \tilde{a}^{1}_{ij} (c_{j}^{1})^{k-1} &amp;= \frac{(c_{i}^{2})^k}{k} , \qquad &amp;
+\sum \limits_{j=1}^{s} \tilde{a}^{3}_{ij} (c_{j}^{3})^{k-1} &amp;= \frac{(c_{i}^{4})^k}{k} , \qquad &amp;
+i &amp;= 1 , \, ... , \, \tilde{s} , \qquad &amp;
+k &amp;= 1 , \, ... , \, s .
+\end{aligned}\]</div><p>The coefficients <span>$a^{2}$</span> and <span>$a^{4}$</span> by the symplecticity conditions, that is <span>$a^{2}_{ij} = b^{2}_{j} ( b^{3}_{i} - \tilde{a}^{3}_{ji} ) / b^{3}_{i}$</span> and <span>$a^{4}_{ij} = b^{4}_{j} ( b^{1}_{i} - \tilde{a}^{1}_{ji}) / b^{1}_{i}$</span>. Finally choose <span>$\omega = [0, 0, 1]$</span> and <span>$\delta = [-1, R_{\infty}]$</span>, implying that <span>$\rho = 1$</span>. By construction, this method satisfies all symplecticity conditions, but the constraint on the projection stages, <span>$\phi(\tilde{Q}_{n,i}, \tilde{P}_{n,i}) = 0$</span> for <span>$i = 1, \, ..., \, \tilde{s}$</span>, is not satisfied exactly, but only approximately, although with bounded error.</p></div></section></article><h2 id="Lobatto-IIIB-IIIA-Projection-•-Definition-2"><a class="docs-heading-anchor" href="#Lobatto-IIIB-IIIA-Projection-•-Definition-2">Lobatto-IIIB-IIIA Projection • Definition 2</a><a id="Lobatto-IIIB-IIIA-Projection-•-Definition-2-1"></a><a class="docs-heading-anchor-permalink" href="#Lobatto-IIIB-IIIA-Projection-•-Definition-2" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKModifiedLobIIIBIIIAProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKModifiedLobIIIBIIIAProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKModifiedLobIIIBIIIAProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>This methods is the same as <code>TableauVSPARKModifiedLobIIIAIIIBProjection</code>, except for using Lobatto-IIIA and IIIB tableaus with <span>$\tilde{s} = 2$</span> stages for <span>$(\tilde{a}^{2}, b^{2})$</span>, and <span>$(\tilde{a}^{4}, b^{4})$</span> respectively, instead of the other way around.</p></div></section></article><h2 id="Midpoint-Projection-•-Definition-1"><a class="docs-heading-anchor" href="#Midpoint-Projection-•-Definition-1">Midpoint Projection • Definition 1</a><a id="Midpoint-Projection-•-Definition-1-1"></a><a class="docs-heading-anchor-permalink" href="#Midpoint-Projection-•-Definition-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKMidpointProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKMidpointProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKMidpointProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>. For the projection, choose the tableau with <span>$\tilde{s} = 1$</span> and <span>$\rho = 0$</span>, such that <span>$\tilde{Q}_{n,1} = \tfrac{1}{2} ( q_{n} + q_{n+1})$</span>, <span>$\tilde{P}_{n,1} = \tfrac{1}{2} ( p_{n} + p_{n+1})$</span>, i.e.,</p><div>\[\begin{aligned}
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} \\
+&amp; \vdots \\
+&amp; \tfrac{1}{2} \\
+\hline
+a^{2} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; \tfrac{1}{2} \\
+&amp; \vdots \\
+&amp; \tfrac{1}{2} \\
+\hline
+a^{4} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+\tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{2} &amp; \tfrac{1}{2} (1 + R(\infty))\\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+\tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{4} &amp; \tfrac{1}{2} (1 + R(\infty))\\
+\end{array}
+\end{aligned}\]</div><p>The coefficients <span>$\tilde{a}^{1}$</span> and <span>$\tilde{a}^{3}$</span> are determined by the symplecticity conditions, specifically <span>$a^{4}_{ij} = b^{4}_{j} ( b^{1}_{i} - \tilde{a}^{1}_{ji}) / b^{1}_{i}$</span> and <span>$a^{2}_{ij} = b^{2}_{j} ( b^{3}_{i} - \tilde{a}^{3}_{ji} ) / b^{3}_{i}$</span>, and <span>$\omega = [0, 1]$</span>.</p></div></section></article><h2 id="Midpoint-Projection-•-Definition-2"><a class="docs-heading-anchor" href="#Midpoint-Projection-•-Definition-2">Midpoint Projection • Definition 2</a><a id="Midpoint-Projection-•-Definition-2-1"></a><a class="docs-heading-anchor-permalink" href="#Midpoint-Projection-•-Definition-2" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKModifiedMidpointProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKModifiedMidpointProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKModifiedMidpointProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>. For the projection, choose the tableau with <span>$\tilde{s} = 1$</span> and <span>$\rho = 0$</span>, such that <span>$\tilde{Q}_{n,1} = \tfrac{1}{2} ( q_{n} + q_{n+1})$</span>, <span>$\tilde{P}_{n,1} = \tfrac{1}{2} ( p_{n} + p_{n+1})$</span>, i.e.,</p><div>\[\begin{aligned}
+\begin{array}{c|cc}
+\tfrac{1}{2} &amp; \tfrac{1}{2} b^{1} \\
+\hline
+\tilde{a}^{1} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+\tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{2} &amp; \tfrac{1}{2} ( 1 + R (\infty) ) \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+\tfrac{1}{2} &amp; \tfrac{1}{2} b^{3} \\
+\hline
+\tilde{a}^{3} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+\tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{4} &amp; \tfrac{1}{2} ( 1 + R (\infty) ) \\
+\end{array}
+\end{aligned}\]</div><p>The coefficients <span>$a^{2}$</span> and <span>$a^{4}$</span> are determined by the symplecticity conditions, specifically <span>$a^{4}_{ij} = b^{4}_{j} ( b^{1}_{i} - \tilde{a}^{1}_{ji}) / b^{1}_{i}$</span> and <span>$a^{2}_{ij} = b^{2}_{j} ( b^{3}_{i} - \tilde{a}^{3}_{ji} ) / b^{3}_{i}$</span>, and <span>$\omega = [0, 1]$</span>.</p></div></section></article><h2 id="Midpoint-Projection-•-Verification"><a class="docs-heading-anchor" href="#Midpoint-Projection-•-Verification">Midpoint Projection • Verification</a><a id="Midpoint-Projection-•-Verification-1"></a><a class="docs-heading-anchor-permalink" href="#Midpoint-Projection-•-Verification" title="Permalink"></a></h2><p>The above constructions should result in identical schemes (up to roundoff error):</p><pre><code class="language-julia">using GeometricIntegrators
+
+for s in 1:4
+    println(&quot;GLRK($s):        &quot;, isapprox(TableauVSPARKGLRKpMidpoint(s), TableauVSPARKGLRKpModifiedMidpoint(s); atol=1E-14), &quot;\n&quot;)
+end
+for s in 2:5
+    println(&quot;LobIIIAIIIB($s): &quot;, isapprox(TableauVSPARKLobIIIAIIIBpMidpoint(s), TableauVSPARKLobIIIAIIIBpModifiedMidpoint(s); atol=1E-14), &quot;\n&quot;)
+end
+for s in 2:5
+    println(&quot;LobIIIBIIIA($s): &quot;, isapprox(TableauVSPARKLobIIIBIIIApMidpoint(s), TableauVSPARKLobIIIBIIIApModifiedMidpoint(s); atol=1E-14), &quot;\n&quot;)
+end</code></pre><pre class="documenter-example-output">GLRK(1):        true
+
+GLRK(2):        true
+
+GLRK(3):        true
+
+GLRK(4):        true
+
+LobIIIAIIIB(2): true
+
+LobIIIAIIIB(3): true
+
+LobIIIAIIIB(4): true
+
+LobIIIAIIIB(5): true
+
+LobIIIBIIIA(2): true
+
+LobIIIBIIIA(3): true
+
+LobIIIBIIIA(4): true
+
+LobIIIBIIIA(5): true</pre><h2 id="Symmetric-Projection"><a class="docs-heading-anchor" href="#Symmetric-Projection">Symmetric Projection</a><a id="Symmetric-Projection-1"></a><a class="docs-heading-anchor-permalink" href="#Symmetric-Projection" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="GeometricIntegrators.Tableaus.TableauVSPARKSymmetricProjection" href="#GeometricIntegrators.Tableaus.TableauVSPARKSymmetricProjection"><code>GeometricIntegrators.Tableaus.TableauVSPARKSymmetricProjection</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Consider a symplectic pair of tableaus <span>$(a^{1}, b^{1}, c^{1})$</span> and <span>$(a^{3}, b^{3}, c^{3})$</span>, i.e., satsifying <span>$b^{1}_{i} b^{3}_{j} = b^{1}_{i} a^{3}_{ij} + b^{3}_{j} a^{1}_{ji}$</span>, with an arbitrary number of stages <span>$s$</span>. For the projection, choose the tableau with <span>$\tilde{s} = 2$</span> and <span>$\rho = 1$</span>, such that <span>$\tilde{Q}_{n,1} = q_{n}$</span>, <span>$\tilde{Q}_{n,2} = q_{n+1}$</span>, <span>$\tilde{P}_{n,1} = p_{n}$</span>, <span>$\tilde{P}_{n,2} = p_{n+1}$</span>, i.e.,</p><div>\[\begin{aligned}
+\begin{array}{c|cc}
+0 &amp; 0 \\
+1 &amp; b^{1} \\
+\hline
+\tilde{a}^{1} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; 0 &amp; 0 \\
+&amp; \tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{2} &amp; \tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+0 &amp; 0 \\
+1 &amp; b^{3} \\
+\hline
+\tilde{a}^{3} &amp; \\
+\end{array}
+&amp;&amp;
+\begin{array}{c|cc}
+&amp; 0 &amp; 0 \\
+&amp; \tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\hline
+\tilde{a}^{4} &amp; \tfrac{1}{2} &amp; \tfrac{1}{2} \\
+\end{array}
+\end{aligned}\]</div><p>The coefficients <span>$a^{2}$</span> and <span>$a^{4}$</span> are determined by the symplecticity conditions, specifically <span>$a^{4}_{ij} = b^{4}_{j} ( b^{1}_{i} - \tilde{a}^{1}_{ji}) / b^{1}_{i}$</span> and <span>$a^{2}_{ij} = b^{2}_{j} ( b^{3}_{i} - \tilde{a}^{3}_{ji} ) / b^{3}_{i}$</span>. Further choose <span>$\omega = [1, 1, 0]$</span> and <span>$\delta = [-1, R_{\infty}]$</span>, so that <span>$\tilde{\Lambda}_{n,1} = R_{\infty} \tilde{\Lambda}_{n,2}$</span> and</p><div>\[\tilde{P}_{n,1} - \vartheta (\tilde{Q}_{n,1}) + R_{\infty} ( \tilde{P}_{n,2} - \vartheta (\tilde{Q}_{n,2}) ) = 0 .\]</div><p>Due to the particular choice of projective stages, this is equivalent to</p><div>\[p_{n} - \vartheta (q_{n}) + R_{\infty} ( p_{n+1} - \vartheta (q_{n+1}) ) = 0 ,\]</div><p>so that the constraint <span>$\phi(q_{n+1}, p_{n+1}) = 0$</span> is satisfied if <span>$\phi(q_{n}, p_{n}) = 0$</span>. Note that the choice of <span>$\tilde{a}^{2}$</span> and <span>$\tilde{a}^{4}$</span> violates the symplecticity condition <span>$b^{2}_{i} b^{4}_{j} = b^{2}_{i} \tilde{a}^{4}_{ij} + b^{4}_{j} \tilde{a}^{2}_{ji}$</span>.</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../lotka-volterra-2d/lotka-volterra-2d-spark-glvprk/">Gauss-Legendre VPRK Methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 23 November 2020 00:20">Monday 23 November 2020</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
