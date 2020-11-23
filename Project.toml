@@ -1,7 +1,7 @@
 name = "SparkMethodsForDegenerateLagrangianSystems"
 uuid = "77d07572-9648-401a-8c14-c79c8092f413"
 authors = ["Michael Kraus"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
