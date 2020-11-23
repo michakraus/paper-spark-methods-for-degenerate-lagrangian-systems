@@ -21,8 +21,7 @@ If you use the figures or implementations provided here, please cite this reposi
 
 ```
 @misc{Kraus:2020:SPARKMethodsRepo,
-  title={{paper-spark-methods-for-degenerate-lagrangian-systems}.
-         SPARK Methods for Degenerate Lagrangian Systems},
+  title={Companion Repository to ``{SPARK} Methods for Degenerate {L}agrangian Systems''},
   author={Kraus, Michael},
   year={2020},
   month={11},
