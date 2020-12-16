@@ -15,11 +15,6 @@ using GeometricIntegrators.Integrators.SPARK: get_ã_vspark_primary,
                                                 compute_ã_vspark_primary,
                                                 compute_α_vspark_primary
 
-using GeometricIntegrators.Tableaus: get_GLRK_ω_matrix,
-                                        get_lobatto_d_vector,
-                                        get_lobatto_ω_matrix,
-                                        get_lobatto_projective_stage, 
-                                        get_lobatto_interstage_coefficients
 
 
 function Integrators.integrate!(int::Union{IntegratorSPARK{DT,TT,D,S,R},IntegratorVSPARKprimary{DT,TT,D,S,R}}, sol::Solution{DT,TT}) where {DT,TT,D,S,R}
