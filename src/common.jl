@@ -144,13 +144,17 @@ function _failure_message(err)
 end
 
 
-# Save one figure, reporting but not propagating a failure: a diagnostic that cannot be
-# plotted for a crashed run must not take the remaining figures of that run down with it.
-function _save(path, makefigure)
+# Save the figure produced by `plot` as `<dir>/<file><suffix><fig_suff>`. A failure is
+# reported but not propagated: one diagnostic that cannot be plotted (which happens for
+# runs that crash after very few time steps) must not cost us the remaining figures.
+function _save_plot(plot, dir, file, suffix, fig_suff)
     try
-        save(path, makefigure())
+        save(dir * "/" * file * suffix * fig_suff, plot())
     catch ex
-        @warn("Plotting $(basename(path)) failed: $(_failure_message(ex))")
+        show(stdout, "text/markdown",
+             Markdown.parse("**Plotting $(file)$(suffix) failed: $(_failure_message(ex)).**"))
+        _linebreak(stdout)
+        @warn("Plotting $(file)$(suffix) failed: $(_failure_message(ex))")
     end
 end
 
@@ -256,35 +260,39 @@ function _plot(sol, stages, equ, dir, file, fig_suff, last_good)
     ntplot = last_good ≥ nt ? (:auto) : last_good
 
     # All GeometricProblems recipes set their own x-limits to the plotted time range.
-    _save(dir * "/" * file * "_energy_error" * fig_suff, () -> plot_energy_error(sol; latex=false, nt=ntplot))
+    _save_plot(() -> plot_energy_error(sol; latex=false, nt=ntplot), dir, file, "_energy_error", fig_suff)
 
-    # Drift is an interval-based diagnostic: `plot_energy_drift` bins the run into
-    # `div(nt, 10)`-step intervals, so a run that crashed before completing the first
-    # interval has no drift data at all and must be skipped — passing `nt = 0` makes the
-    # recipe index into an empty range.
-    ntdrift = last_good ≥ nt ? (:auto) : div(last_good, div(nt, 10))
-    if ntdrift === :auto || ntdrift ≥ 1
-        _save(dir * "/" * file * "_energy_drift" * fig_suff, () -> plot_energy_drift(sol; latex=false, nt=ntdrift))
+    # Drift is an interval-based diagnostic: `plot_energy_drift` splits the solution into ten
+    # intervals and its `nt` counts those intervals, not time steps. Show only the intervals
+    # completed before a crash – and skip the plot unless at least two of them were
+    # completed, as a single point has no drift to show and a degenerate x-range throws.
+    # Solutions shorter than ten steps have no intervals at all and make the recipe itself
+    # divide by zero, so they are skipped outright (short runs only happen in local tests).
+    interval = max(div(nt, 10), 1)
+    ntdrift  = last_good ≥ nt ? (:auto) : div(last_good, interval)
+
+    if nt ≥ 10 && (ntdrift === :auto || ntdrift ≥ 2)
+        _save_plot(() -> plot_energy_drift(sol; latex=false, nt=ntdrift), dir, file, "_energy_drift", fig_suff)
     end
 
-    _save(dir * "/" * file * "_constraint_error" * fig_suff, () -> plot_constraint_error(sol; latex=false, nt=ntplot))
+    _save_plot(() -> plot_constraint_error(sol; latex=false, nt=ntplot), dir, file, "_constraint_error", fig_suff)
 
-    _save(dir * "/" * file * "_lambda" * fig_suff, () -> plot_lagrange_multiplier(sol; latex=false, nt=ntplot))
+    _save_plot(() -> plot_lagrange_multiplier(sol; latex=false, nt=ntplot), dir, file, "_lambda", fig_suff)
 
     if stages !== nothing
         for i in eachindex(stages.Φi)
-            _save(dir * "/" * file * "_constraint_error_phi_i$(i)" * fig_suff,
-                  () -> plot_constraint_error(sol.t, stages.Φi[i]; latex=false, nt=ntplot, plot_title="Φi,$(i)"))
+            _save_plot(() -> plot_constraint_error(sol.t, stages.Φi[i]; latex=false, nt=ntplot, plot_title="Φi,$(i)"),
+                       dir, file, "_constraint_error_phi_i$(i)", fig_suff)
         end
 
         for i in eachindex(stages.Φp)
-            _save(dir * "/" * file * "_constraint_error_phi_p$(i)" * fig_suff,
-                  () -> plot_constraint_error(sol.t, stages.Φp[i]; latex=false, nt=ntplot, plot_title="Φp,$(i)"))
+            _save_plot(() -> plot_constraint_error(sol.t, stages.Φp[i]; latex=false, nt=ntplot, plot_title="Φp,$(i)"),
+                       dir, file, "_constraint_error_phi_p$(i)", fig_suff)
         end
 
         for i in eachindex(stages.Λp)
-            _save(dir * "/" * file * "_lambda_p$(i)" * fig_suff,
-                  () -> plot_lagrange_multiplier(sol.t, stages.Λp[i]; latex=false, nt=ntplot, plot_title="Λp,$(i)"))
+            _save_plot(() -> plot_lagrange_multiplier(sol.t, stages.Λp[i]; latex=false, nt=ntplot, plot_title="Λp,$(i)"),
+                       dir, file, "_lambda_p$(i)", fig_suff)
         end
     end
 end

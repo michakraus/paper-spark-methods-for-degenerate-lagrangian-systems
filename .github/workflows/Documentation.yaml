@@ -1,5 +1,8 @@
 name: Documentation
 
+# Building the documentation runs every integration of every method family over the full
+# time interval, so it is far too expensive to run on feature branches: `deploydocs`
+# publishes from `main` and tags only.
 on:
   push:
     branches:
@@ -8,29 +11,32 @@ on:
       - '*'
   workflow_dispatch:
 
+# Superseded runs on the same ref are pointless.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Widened to `write` on the deploying job only.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  # Each of the fourteen documents is woven in its own job and its own Julia process.
-  # Together they run 216 simulations over 100000 time steps and write some 2900
-  # figures, which does not fit into a single hosted runner: the previous, sequential
-  # workflow needed more than three hours and was killed by the runner half way through.
+  # One job per weave document: together the fourteen documents run 216 simulations over
+  # 100000 time steps and write some 2900 figures, which does not fit into a single hosted
+  # runner — the original, sequential workflow needed more than three hours and was killed
+  # half way through.
   weave:
-    name: Weave ${{ matrix.problem }} ${{ matrix.document }}
+    name: Weave ${{ matrix.problem }} ${{ matrix.page }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
+      # A crashing integrator must not prevent the remaining pages from being built.
       fail-fast: false
       matrix:
         problem:
           - lotka-volterra-2d
           - massless-charged-particle
-        document:
+        page:
           - glvprk
           - glspark
           - lobspark
@@ -43,45 +49,74 @@ jobs:
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1'
+      # All jobs of this workflow share one depot cache: the default cache name includes
+      # the job name and the matrix values, which would give us one near-identical cache
+      # per matrix cell and a cold cache in the `documenter` job.
       - uses: julia-actions/cache@v2
+        with:
+          cache-name: julia-cache;workflow=${{ github.workflow }}
+          include-matrix: false
       - name: Install dependencies
         run: julia --project --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile();'
-      - name: Weave
-        run: julia --project=.. --color=yes weave-document.jl ${{ matrix.problem }} ${{ matrix.document }}
+      - name: Weave page
+        run: julia --project=.. --color=yes weave.jl ${{ matrix.problem }} ${{ matrix.page }}
         working-directory: docs
+      # Stage the output below a common root, so that the artifacts of all pages merge
+      # back into `docs/src/<problem>/` in the `documenter` job.
+      - name: Stage generated page
+        run: |
+          mkdir -p staging/${{ matrix.problem }}
+          cp -R docs/src/${{ matrix.problem }}/. staging/${{ matrix.problem }}/
       - uses: actions/upload-artifact@v4
         with:
-          name: weave-${{ matrix.problem }}-${{ matrix.document }}
-          path: docs/src/${{ matrix.problem }}
+          name: pages-${{ matrix.problem }}-${{ matrix.page }}
+          path: staging
           retention-days: 1
 
-  documentation:
-    name: Build and deploy
+  # Collect the woven pages and figures of all problems, then build and deploy the docs.
+  documenter:
+    name: Documenter
     needs: weave
+    # Build even when some pages failed, so that there is a build log and a site to look
+    # at; the deployment itself is gated on a complete run below. `!cancelled()` still
+    # respects cancellation through the `concurrency` group.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1'
       - uses: julia-actions/cache@v2
+        with:
+          cache-name: julia-cache;workflow=${{ github.workflow }}
       - name: Install dependencies
         run: julia --project --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile();'
-      - name: Collect woven documents
+      - name: Collect woven pages
         uses: actions/download-artifact@v4
         with:
-          pattern: weave-lotka-volterra-2d-*
-          path: docs/src/lotka-volterra-2d
+          pattern: pages-*
           merge-multiple: true
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: weave-massless-charged-particle-*
-          path: docs/src/massless-charged-particle
-          merge-multiple: true
+          path: docs/src
       - name: Documentation
         run: julia --project=.. --color=yes make.jl
         working-directory: docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          # Publish a complete site only: `needs.weave.result` is `success` exactly when
+          # every matrix job succeeded. A partial deployment would silently drop pages
+          # from the published documentation.
+          DEPLOY_DOCS: ${{ needs.weave.result == 'success' }}
+      # Nothing was deployed in that case, so keep the site around for inspection.
+      - name: Upload site of the incomplete build
+        if: ${{ always() && needs.weave.result != 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: documenter-site
+          path: docs/build
+          retention-days: 7
+          if-no-files-found: ignore
