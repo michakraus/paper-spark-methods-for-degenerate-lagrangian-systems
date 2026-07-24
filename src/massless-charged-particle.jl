@@ -22,9 +22,9 @@ module MasslessChargedParticleSPARK
 
         ntplot = last_good ≥ ntime(sol) ? (:auto) : last_good
 
-        CairoMakie.save(dir * "/" * file * fig_suff, plot_solution(sol, equ; latex=false, nt=ntplot))
-        CairoMakie.save(dir * "/" * file * "_solution" * fig_suff, plot_phase_portrait(sol; latex=false, nt=ntplot))
-        CairoMakie.save(dir * "/" * file * "_traces" * fig_suff, plot_traces(sol, equ; latex=false, nt=ntplot))
+        _save(dir * "/" * file * fig_suff, () -> plot_solution(sol, equ; latex=false, nt=ntplot))
+        _save(dir * "/" * file * "_solution" * fig_suff, () -> plot_phase_portrait(sol; latex=false, nt=ntplot))
+        _save(dir * "/" * file * "_traces" * fig_suff, () -> plot_traces(sol, equ; latex=false, nt=ntplot))
 
         _plot(sol, stages, equ, dir, file, fig_suff, last_good)
     end

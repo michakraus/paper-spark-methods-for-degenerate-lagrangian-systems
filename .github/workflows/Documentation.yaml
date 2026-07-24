@@ -1,22 +1,84 @@
 name: Documentation
+
 on:
-  - push
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
-  build:
+  # Each of the fourteen documents is woven in its own job and its own Julia process.
+  # Together they run 216 simulations over 100000 time steps and write some 2900
+  # figures, which does not fit into a single hosted runner: the previous, sequential
+  # workflow needed more than three hours and was killed by the runner half way through.
+  weave:
+    name: Weave ${{ matrix.problem }} ${{ matrix.document }}
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        problem:
+          - lotka-volterra-2d
+          - massless-charged-particle
+        document:
+          - glvprk
+          - glspark
+          - lobspark
+          - pinternal
+          - plobatto
+          - pmidpoint
+          - psymmetric
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: '1'
+      - uses: julia-actions/cache@v2
       - name: Install dependencies
-        run: julia --project --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.precompile();'
-      - name: Lotka-Volterra 2d
-        run: julia --project=.. --color=yes weave-lotka-volterra-2d.jl
+        run: julia --project --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile();'
+      - name: Weave
+        run: julia --project=.. --color=yes weave-document.jl ${{ matrix.problem }} ${{ matrix.document }}
         working-directory: docs
-      - name: Massless Charged Particle
-        run: julia --project=.. --color=yes weave-massless-charged-particle.jl
-        working-directory: docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weave-${{ matrix.problem }}-${{ matrix.document }}
+          path: docs/src/${{ matrix.problem }}
+          retention-days: 1
+
+  documentation:
+    name: Build and deploy
+    needs: weave
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v2
+      - name: Install dependencies
+        run: julia --project --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile();'
+      - name: Collect woven documents
+        uses: actions/download-artifact@v4
+        with:
+          pattern: weave-lotka-volterra-2d-*
+          path: docs/src/lotka-volterra-2d
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: weave-massless-charged-particle-*
+          path: docs/src/massless-charged-particle
+          merge-multiple: true
       - name: Documentation
         run: julia --project=.. --color=yes make.jl
         working-directory: docs
