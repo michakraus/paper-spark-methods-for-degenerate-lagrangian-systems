@@ -3,5 +3,5 @@
 ## Gauss-Legendre SPARK Methods
 
 ```julia
-run_list_spark_glrk(massless_charged_particle_idae_spark())
+run_list_spark_glrk(idaeproblem_spark(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```

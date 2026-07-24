@@ -3,5 +3,5 @@
 ## Gauss-Lobatto SPARK Methods
 
 ```julia
-run_list_spark_lobatto(massless_charged_particle_idae_spark())
+run_list_spark_lobatto(idaeproblem_spark(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```

@@ -3,5 +3,5 @@
 ## Symmetric Projection
 
 ```julia
-run_list_vspark_symmetric_projection(massless_charged_particle_idae())
+run_list_vspark_symmetric_projection(idaeproblem(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```

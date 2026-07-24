@@ -3,19 +3,20 @@
 ## Variational Partitioned Runge-Kutta Methods
 
 ```@docs
-TableauSPARKGLVPRK
+SPARKGLVPRK
 ```
 
 ## Gauss-Legendre SPARK Methods
 
 ```@docs
-TableauSPARKGLRK
+SPARKGLRK
 ```
 
 ## Lobatto SPARK Methods
 
 ```@docs
-TableauSPARKLobatto
+SPARKLobABC
+SPARKLobABD
 ```
 
 ## Internal Projection • Definition 1
@@ -33,25 +34,25 @@ TableauVSPARKModifiedInternalProjection
 ## Lobatto-IIIA-IIIB Projection • Definition 1
 
 ```@docs
-TableauVSPARKLobIIIAIIIBProjection
+TableauVSPARKGLRKpLobattoIIIAIIIB
 ```
 
 ## Lobatto-IIIB-IIIA Projection • Definition 1
 
 ```@docs
-TableauVSPARKLobIIIBIIIAProjection
+TableauVSPARKGLRKpLobattoIIIBIIIA
 ```
 
 ## Lobatto-IIIA-IIIB Projection • Definition 2
 
 ```@docs
-TableauVSPARKModifiedLobIIIAIIIBProjection
+TableauVSPARKGLRKpModifiedLobattoIIIAIIIB
 ```
 
 ## Lobatto-IIIB-IIIA Projection • Definition 2
 
 ```@docs
-TableauVSPARKModifiedLobIIIBIIIAProjection
+TableauVSPARKGLRKpModifiedLobattoIIIBIIIA
 ```
 
 ## Midpoint Projection • Definition 1
@@ -68,19 +69,23 @@ TableauVSPARKModifiedMidpointProjection
 
 ## Midpoint Projection • Verification
 
-The above constructions should result in identical schemes (up to roundoff error):
+The above constructions should result in identical schemes (up to roundoff error).
+The following check compares the tableaus of the two constructions (note that
+`isapprox` for these tableaus requires a GeometricIntegrators version in which the
+comparison of the optional null vector is supported):
 
-```@example
+```julia
 using GeometricIntegrators
+using GeometricIntegrators.SPARK
 
 for s in 1:4
-    println("GLRK($s):        ", isapprox(TableauVSPARKGLRKpMidpoint(s), TableauVSPARKGLRKpModifiedMidpoint(s); atol=1E-14), "\n")
+    println("GLRK($s):        ", isapprox(tableau(TableauVSPARKGLRKpMidpoint(s)), tableau(TableauVSPARKGLRKpModifiedMidpoint(s)); atol=1E-14), "\n")
 end
 for s in 2:5
-    println("LobIIIAIIIB($s): ", isapprox(TableauVSPARKLobIIIAIIIBpMidpoint(s), TableauVSPARKLobIIIAIIIBpModifiedMidpoint(s); atol=1E-14), "\n")
+    println("LobIIIAIIIB($s): ", isapprox(tableau(TableauVSPARKLobattoIIIAIIIBpMidpoint(s)), tableau(TableauVSPARKLobattoIIIAIIIBpModifiedMidpoint(s)); atol=1E-14), "\n")
 end
 for s in 2:5
-    println("LobIIIBIIIA($s): ", isapprox(TableauVSPARKLobIIIBIIIApMidpoint(s), TableauVSPARKLobIIIBIIIApModifiedMidpoint(s); atol=1E-14), "\n")
+    println("LobIIIBIIIA($s): ", isapprox(tableau(TableauVSPARKLobattoIIIBIIIApMidpoint(s)), tableau(TableauVSPARKLobattoIIIBIIIApModifiedMidpoint(s)); atol=1E-14), "\n")
 end
 ```
 

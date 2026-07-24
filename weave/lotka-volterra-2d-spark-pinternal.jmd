@@ -3,11 +3,11 @@
 ## Internal Projection • Definition 1
 
 ```julia
-run_list_vspark_internal_projection(lotka_volterra_2d_idae())
+run_list_vspark_internal_projection(idaeproblem(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```
 
 ## Internal Projection • Definition 2
 
 ```julia
-run_list_vspark_modified_internal_projection(lotka_volterra_2d_idae())
+run_list_vspark_modified_internal_projection(idaeproblem(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```

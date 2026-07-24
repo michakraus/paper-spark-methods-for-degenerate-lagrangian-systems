@@ -3,11 +3,11 @@
 ## Midpoint Projection • Definition 1
 
 ```julia
-run_list_vspark_midpoint_projection(lotka_volterra_2d_idae())
+run_list_vspark_midpoint_projection(idaeproblem(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```
 
 ## Midpoint Projection • Definition 2
 
 ```julia
-run_list_vspark_modified_midpoint_projection(lotka_volterra_2d_idae())
+run_list_vspark_modified_midpoint_projection(idaeproblem(timestep = Δt, timespan = (0.0, Δt * nt)))
 ```

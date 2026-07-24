@@ -7,35 +7,28 @@ module LotkaVolterra2dSingularSPARK
     const SYMP_DIR = "symplecticity"
 
     using GeometricIntegrators
-    using GeometricProblems.LotkaVolterra2dSingular
-    using GeometricProblems.LotkaVolterra2dPlots
 
-    set_config(:nls_atol, 1E-14)
-    set_config(:nls_rtol, 1E-14)
-    set_config(:nls_atol_break, 1E6)
-    set_config(:nls_rtol_break, 1E6)
-    set_config(:nls_stol_break, 1E6)
-    set_config(:nls_nmax, 100);
-    
+    using GeometricProblems.LotkaVolterra2dSingular
+    using GeometricProblems.LotkaVolterra2d: plot_solution, plot_phase_portrait, plot_traces
+
     include("common.jl")
     include("tableau_lists.jl")
 
 
-    function plot(sol, stages, equ, dir, file, fig_suff)
+    function make_plots(sol, stages, equ, dir, file, fig_suff, last_good)
         if !isdir(dir)
             mkdir(dir)
         end
 
-        plot_lotka_volterra_2d(sol, equ; nt=lastentry(sol), fmt=:png)
-        savefig(dir * "/" * file * fig_suff)
+        ntplot = last_good ≥ ntime(sol) ? (:auto) : last_good
 
-        plot_lotka_volterra_2d_solution(sol, equ; nt=lastentry(sol), fmt=:png)
-        savefig(dir * "/" * file * "_solution" * fig_suff)
+        CairoMakie.save(dir * "/" * file * fig_suff, plot_solution(sol, equ; latex=false, nt=ntplot))
+        CairoMakie.save(dir * "/" * file * "_solution" * fig_suff, plot_phase_portrait(sol; latex=false, nt=ntplot))
+        CairoMakie.save(dir * "/" * file * "_traces" * fig_suff, plot_traces(sol, equ; latex=false, nt=ntplot))
 
-        plot_lotka_volterra_2d_traces(sol, equ; nt=lastentry(sol), fmt=:png)
-        savefig(dir * "/" * file * "_traces" * fig_suff)
-
-        _plot(sol, stages, equ, dir, file, fig_suff)
+        _plot(sol, stages, equ, dir, file, fig_suff, last_good)
     end
+
+    export run_list
 
 end

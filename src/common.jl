@@ -1,123 +1,136 @@
 
-using Documenter
 using Latexify
 using Markdown
 using Markdown: MD, Paragraph, LineBreak
-using Plots
-
-using GeometricProblems.Diagnostics
-using GeometricProblems.PlotRecipes
+using CairoMakie
 
 using GeometricIntegrators
-using GeometricIntegrators.Integrators.SPARK
-using GeometricIntegrators.Integrators.SPARK: get_ã_vspark_primary,
-                                                get_α_vspark_primary,
-                                                compute_ã_vspark_primary,
-                                                compute_α_vspark_primary
+using GeometricIntegrators.SPARK
+import GeometricIntegratorsBase
+const GIB = GeometricIntegratorsBase
+using SimpleSolvers: NonlinearSolverException
+
+using GeometricProblems.Diagnostics: plot_energy_error, plot_energy_drift,
+                                     plot_constraint_error, plot_lagrange_multiplier
 
 
+# Shared Makie plotting style (kept identical to the SRK companion package). Larger
+# fonts and thicker lines than the Makie defaults, tuned for the fixed figure sizes of
+# the GeometricProblems plot recipes. Unicode axis labels are selected via `latex=false`
+# on every plot call below.
+const PLOT_THEME = Theme(
+    fontsize = 18,
+    Lines    = (linewidth = 2,),
+    Scatter  = (markersize = 10,),
+    Axis     = (
+        xlabelsize     = 22,
+        ylabelsize     = 22,
+        xticklabelsize = 16,
+        yticklabelsize = 16,
+        titlesize      = 20,
+    ),
+)
 
-function Integrators.integrate!(int::Union{IntegratorSPARK{DT,TT,D,S,R},IntegratorVSPARKprimary{DT,TT,D,S,R}}, sol::Solution{DT,TT}) where {DT,TT,D,S,R}
-    asol = AtomicSolution(int)
+set_theme!(PLOT_THEME)
 
-    Qi = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:S]
-    Pi = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:S]
-    Vi = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:S]
-    Φi = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:S]
 
-    Qp = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:R]
-    Pp = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:R]
-    Λp = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:R]
-    Φp = [SDataSeries(DT, D, ntime(sol), nsamples(sol)) for i in 1:R]
+# Integrate an IDAE with a SPARK/VSPARK method, collecting the internal and
+# projection stage variables (Qi,Pi,Vi,Φi,Qp,Pp,Λp,Φp) alongside the solution.
+# The plain `integrate` does not persist these, so we drive the integrator
+# step-by-step and read them off the solution step (mirrors GeometricIntegratorsBase's
+# own integration loop). A crash (solver failure, singular matrix, NaNs, …) does not
+# discard the run: we keep the solution and stages up to the last successful step.
+# Returns `(sol, stages, last_good, err)` where `last_good` is the index of the last
+# completed step and `err` is `nothing`, `:nan`, or the caught exception.
+function integrate_spark(idae, method)
+    int     = GIB.GeometricIntegrator(idae, method; f_abstol=1E-14, f_reltol=1E-14, max_iterations=100)
+    sol     = GIB.Solution(idae)
+    solstep = GIB.solutionstep(int, sol[0])
+    state   = GIB.current(solstep)
 
-    # loop over initial conditions showing progress bar
-    for m in eachsample(sol)
-        # get cache from solution
-        get_initial_conditions!(sol, asol, m, 1)
-        initialize!(int, asol)
+    internal = GIB.internal(solstep)
+    S  = length(internal.Qi)
+    R  = length(internal.Qp)
+    D  = length(sol.q[0])
+    nt = GIB.ntime(sol)
 
-        # loop over time steps
-        n = 0
-        try
-            for outer n in eachtimestep(sol)
-                integrate!(int, sol, asol, m, n)
+    series() = DataSeries(zeros(D), nt)
+    Qi = [series() for _ in 1:S]; Pi = [series() for _ in 1:S]
+    Vi = [series() for _ in 1:S]; Φi = [series() for _ in 1:S]
+    Qp = [series() for _ in 1:R]; Pp = [series() for _ in 1:R]
+    Λp = [series() for _ in 1:R]; Φp = [series() for _ in 1:R]
 
-                for i in eachindex(Qi,Pi,Vi,Φi)
-                    set_data!(Qi[i], asol.internal.Qi[i], n, m)
-                    set_data!(Pi[i], asol.internal.Pi[i], n, m)
-                    set_data!(Vi[i], asol.internal.Vi[i], n, m)
-                    set_data!(Φi[i], asol.internal.Φi[i], n, m)
-                end
+    last_good = 0
+    err = nothing
 
-                for i in eachindex(Qp,Pp,Λp,Φp)
-                    set_data!(Qp[i], asol.internal.Qp[i], n, m)
-                    set_data!(Pp[i], asol.internal.Pp[i], n, m)
-                    set_data!(Λp[i], asol.internal.Λp[i], n, m)
-                    set_data!(Φp[i], asol.internal.Φp[i], n, m)
-                end
+    try
+        for n in 1:nt
+            GIB.reset!(solstep, GIB.timesteps(sol)[n])
+            GIB.integrate!(solstep, int)
+
+            if isnan(state)
+                err = :nan
+                break
             end
-        catch ex
-            tstr = " in time step " * string(n)
-        
-            if nsamples(sol) > 1
-                tstr *= " for initial condition " * string(m)
+
+            ii = GIB.internal(solstep)
+            for i in 1:S
+                Qi[i][n] = copy(ii.Qi[i]); Pi[i][n] = copy(ii.Pi[i])
+                Vi[i][n] = copy(ii.Vi[i]); Φi[i][n] = copy(ii.Φi[i])
             end
-            
-            tstr *= "."
-            
-            if isa(ex, DomainError)
-                show(stdout, "text/markdown", Markdown.parse("DOMAIN ERROR: Simulation crashed" * tstr))
-                @warn("DOMAIN ERROR: Simulation crashed" * tstr)
-            elseif isa(ex, NonlinearSolverException)
-                show(stdout, "text/markdown", Markdown.parse("SOLVER ERROR: Simulation crashed" * tstr))
-                show(stdout, "text/markdown", Markdown.parse(ex.msg))
-                @warn("SOLVER ERROR: Simulation crashed" * tstr)
-                @warn(ex.msg)
-            else
-                show(stdout, "text/markdown", Markdown.parse("ERROR: Simulation crashed with $(typeof(ex)) " * tstr))
-                show(stdout, "text/markdown", Markdown.parse(ex.msg))
-                @warn("ERROR: Simulation crashed with $(typeof(ex)) " * tstr)
-                @warn(ex.msg)
-                # showerror(stdout, ex, catch_backtrace())
+            for i in 1:R
+                Qp[i][n] = copy(ii.Qp[i]); Pp[i][n] = copy(ii.Pp[i])
+                Λp[i][n] = copy(ii.Λp[i]); Φp[i][n] = copy(ii.Φp[i])
             end
+
+            copy!(sol, state, n)
+            last_good = n
         end
+    catch ex
+        err = ex
     end
 
-    (Qi=Qi, Pi=Pi, Vi=Vi, Φi=Φi, Qp=Qp, Pp=Pp, Λp=Λp, Φp=Φp)
+    # pad the state after the last good step so downstream invariant computations
+    # (energy / momentum error over the full solution) never see uninitialized data
+    for n in (last_good+1):nt
+        sol.q[n] = copy(sol.q[last_good])
+        sol.p[n] = copy(sol.p[last_good])
+    end
+
+    (sol, (Qi=Qi, Pi=Pi, Vi=Vi, Φi=Φi, Qp=Qp, Pp=Pp, Λp=Λp, Φp=Φp), last_good, err)
 end
 
 
-# function _arr_str(a)
-#     # io = IOBuffer()
-#     # show(io, "text/plain", a)
-#     # String(take!(io))
+# Short, human-readable one-line description of a crash (no stack trace).
+function _failure_message(err)
+    err === :nan                      && return "NaNs detected in the solution"
+    err isa NonlinearSolverException  && return "solver error – " * err.msg
+    err isa DomainError               && return "domain error"
+    return string(nameof(typeof(err)))
+end
 
-#     # astr = latexify(a; env=:array)
-#     # astr = replace(astr, "\\begin{equation}" => "\$")
-#     # astr = replace(astr, "\\end{equation}" => "\$")
-#     # Markdown.parse(astr)
-# end
 
 _arr_str(a) = latexify(a; env=:mdtable, latex=false, side=collect(axes(a,1)), head=collect(axes(a,2)))
 _linebreak(io) = show(io, "text/markdown", MD(Paragraph([LineBreak()])))
 
 
-function write_symplecticity(tab, dir, file, name)
+function write_symplecticity(method, dir, file, name)
     if !isdir(dir)
         mkdir(dir)
     end
 
     symp_file = dir * "/" * file * ".md"
 
-    symp_cond = symplecticity_conditions(tab)
-    symp_arrs = check_symplecticity(tab)
+    tab       = tableau(method)
+    symp_cond = GIB.symplecticity_conditions(tab)
+    symp_arrs = SPARK.check_symplecticity(tab)
 
     open(symp_file, "w") do f
         show(f, "text/markdown", Markdown.parse("# $name"))
         _linebreak(f)
         show(f, "text/markdown", Markdown.parse("## Symplecticity Conditions"))
         _linebreak(f)
-        
+
         for i in eachindex(symp_arrs, symp_cond)
             show(f, "text/markdown", Markdown.parse(symp_cond[i]))
             _linebreak(f)
@@ -140,8 +153,9 @@ function _plot_figure_md(file, name, filename)
 end
 
 
-function write_plots(tab, dir, file, name, fig_suff)
+function write_plots(method, dir, file, name, fig_suff)
 
+    tab = tableau(method)
     plot_file = file * ".md"
 
     open(plot_file, "w") do f
@@ -164,7 +178,7 @@ function write_plots(tab, dir, file, name, fig_suff)
 
         for i in 1:tab.s
             _plot_figure_md(f, name, "$(dir)/$(file)_constraint_error_phi_i$(i)$(fig_suff)")
-        end    
+        end
 
         for i in 1:tab.r
             _plot_figure_md(f, name, "$(dir)/$(file)_constraint_error_phi_p$(i)$(fig_suff)")
@@ -180,66 +194,66 @@ function write_plots(tab, dir, file, name, fig_suff)
 end
 
 
-function _plot(sol, stages, equ, dir, file, fig_suff)
-    H, ΔH = compute_energy_error(sol.t, sol.q, equ.parameters)
-    plotenergyerror(sol.t, ΔH; nt=lastentry(sol), fmt=:png)
-    savefig(dir * "/" * file * "_energy_error" * fig_suff)
+function _plot(sol, stages, equ, dir, file, fig_suff, last_good)
+    nt     = ntime(sol)
+    ntplot = last_good ≥ nt ? (:auto) : last_good
 
-    plotenergydrift(compute_error_drift(sol.t, ΔH, div(ntime(sol), 10))...; nt=lastentry(sol))
-    savefig(dir * "/" * file * "_energy_drift" * fig_suff)
+    # All GeometricProblems recipes set their own x-limits to the plotted time range.
+    save(dir * "/" * file * "_energy_error" * fig_suff, plot_energy_error(sol; latex=false, nt=ntplot))
 
-    plotconstrainterror(sol.t, compute_momentum_error(sol.t, sol.q, sol.p, (t,q,k)->ϑ(t,q,equ.parameters,k)); nt=lastentry(sol), fmt=:png)
-    savefig(dir * "/" * file * "_constraint_error" * fig_suff)
+    # Drift is an interval-based diagnostic; only show the intervals before the crash.
+    ntdrift = last_good ≥ nt ? (:auto) : div(last_good, div(nt, 10))
+    save(dir * "/" * file * "_energy_drift" * fig_suff, plot_energy_drift(sol; latex=false, nt=ntdrift))
 
-    plotlagrangemultiplier(sol.t, sol.λ; nt=lastentry(sol), fmt=:png)
-    savefig(dir * "/" * file * "_lambda" * fig_suff)
+    save(dir * "/" * file * "_constraint_error" * fig_suff, plot_constraint_error(sol; latex=false, nt=ntplot))
+
+    save(dir * "/" * file * "_lambda" * fig_suff, plot_lagrange_multiplier(sol; latex=false, nt=ntplot))
 
     if stages !== nothing
         for i in eachindex(stages.Φi)
-            plotconstrainterror(sol.t, stages.Φi[i]; nt=lastentry(sol), fmt=:png, plot_title="Φi,$(i)")
-            savefig(dir * "/" * file * "_constraint_error_phi_i$(i)" * fig_suff)
+            save(dir * "/" * file * "_constraint_error_phi_i$(i)" * fig_suff,
+                 plot_constraint_error(sol.t, stages.Φi[i]; latex=false, nt=ntplot, plot_title="Φi,$(i)"))
         end
 
         for i in eachindex(stages.Φp)
-            plotconstrainterror(sol.t, stages.Φp[i]; nt=lastentry(sol), fmt=:png, plot_title="Φp,$(i)")
-            savefig(dir * "/" * file * "_constraint_error_phi_p$(i)" * fig_suff)
+            save(dir * "/" * file * "_constraint_error_phi_p$(i)" * fig_suff,
+                 plot_constraint_error(sol.t, stages.Φp[i]; latex=false, nt=ntplot, plot_title="Φp,$(i)"))
         end
 
         for i in eachindex(stages.Λp)
-            plotlagrangemultiplier(sol.t, stages.Λp[i]; nt=lastentry(sol), fmt=:png, plot_title="Λp,$(i)")
-            savefig(dir * "/" * file * "_lambda_p$(i)" * fig_suff)
+            save(dir * "/" * file * "_lambda_p$(i)" * fig_suff,
+                 plot_lagrange_multiplier(sol.t, stages.Λp[i]; latex=false, nt=ntplot, plot_title="Λp,$(i)"))
         end
     end
 end
 
 
-function run_spark(idae, tab, nt, dir, file, fig_suff, phi_average)
-    sol = Solution(idae, Δt, nt)
-    int = Integrator(idae, tab, Δt)
-
-    stages = integrate!(int, sol)
-
-    if phi_average !== nothing
-        push!(stages.Φp, SDataSeries(phi_average([parent(stages.Φp[i]) for i in eachindex(stages.Φp)])))
+function run_spark(idae, method, dir, file, fig_suff, phi_average)
+    if !isdir(dir)
+        mkdir(dir)
     end
 
-    # if length(stages.Φp) == 2
-    #     push!(stages.Φp, SDataSeries(parent(stages.Φp[1]) .+ parent(stages.Φp[2])))
-    #     push!(stages.Φp, SDataSeries(parent(stages.Φp[1]) .- parent(stages.Φp[2])))
-    # end
+    sol, stages, last_good, err = integrate_spark(idae, method)
 
-    try
-        plot(sol, stages, idae, dir, file, fig_suff)
-    catch ex
-        if isa(ex, DomainError)
-            show(stdout, "text/markdown", Markdown.parse("DOMAIN ERROR: Diagnostics crashed."))
-            @warn("DOMAIN ERROR: Diagnostics crashed.")
-        else
-            show(stdout, "text/markdown", Markdown.parse("ERROR: Plot crashed with $(typeof(ex))"))
-            show(stdout, "text/markdown", Markdown.parse(ex.msg))
-            @warn("ERROR: Plot crashed with $(typeof(ex))")
-            @warn(ex.msg)
-            showerror(stdout, ex, catch_backtrace())
+    if err !== nothing
+        show(stdout, "text/markdown",
+             Markdown.parse("**Simulation crashed after $(last_good) of $(ntime(sol)) time steps: $(_failure_message(err)).**"))
+        _linebreak(stdout)
+        @warn("Simulation crashed after $(last_good) of $(ntime(sol)) time steps: $(_failure_message(err))")
+    end
+
+    if phi_average !== nothing && stages !== nothing
+        push!(stages.Φp, DataSeries(phi_average([parent(stages.Φp[i]) for i in eachindex(stages.Φp)])))
+    end
+
+    # Plot whatever was computed (the trajectory and stages up to the last good step).
+    if last_good ≥ 1
+        try
+            make_plots(sol, stages, idae, dir, file, fig_suff, last_good)
+        catch ex
+            show(stdout, "text/markdown", Markdown.parse("**Plotting failed: $(_failure_message(ex)).**"))
+            _linebreak(stdout)
+            @warn("Plotting failed: $(_failure_message(ex))")
         end
     end
 end
@@ -249,23 +263,22 @@ function run_list(idae, name, list, plot_dir = PLOT_DIR, symp_dir = SYMP_DIR;
                     fig_suff = ".png", phi_average = nothing)
 
     for run in list
-        tab, file = run
+        method = run[1]
+        file   = run[2]
 
-        write_plots(tab, plot_dir, file, name, fig_suff)
-        write_symplecticity(tab, symp_dir, file, name)
+        write_plots(method, plot_dir, file, name, fig_suff)
+        write_symplecticity(method, symp_dir, file, name)
 
-        show(stdout, "text/markdown", Markdown.parse("### $(tab.name)"))
+        show(stdout, "text/markdown", Markdown.parse("### $(tableau(method).name)"))
         _linebreak(stdout)
 
         show(stdout, "text/markdown", Markdown.parse("[Plots]($file.md)"))
         show(stdout, "text/markdown", Markdown.parse(" • "))
         show(stdout, "text/markdown", Markdown.parse("[Symplecticity]($symp_dir/$file.md)"))
-        show(stdout, "text/markdown", Markdown.parse(" • Tableau: "))
-        show(stdout, "text/markdown", Markdown.parse("[`$name`](@ref)"))
 
         _linebreak(stdout)
 
-        run_spark(idae, tab, length(run) ≥ 3 ? run[3] : nt, plot_dir, file, fig_suff, phi_average)
+        run_spark(idae, method, plot_dir, file, fig_suff, phi_average)
         show(stdout, "text/markdown", Markdown.parse("![$name]($plot_dir/$file$fig_suff)"))
     end
 

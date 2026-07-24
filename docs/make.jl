@@ -1,12 +1,17 @@
 using Documenter
 using GeometricIntegrators
+using GeometricIntegrators.SPARK
 
 makedocs(;
     authors="Michael Kraus",
     sitename="SPARK Methods for Degenerate Lagrangian Systems",
+    # Some integrators crash on the degenerate Lagrangian and therefore produce no
+    # figures; their pages reference those (missing) images unconditionally. Downgrade
+    # the resulting broken-link errors to warnings (Documenter ≥ 1 errors by default).
+    warnonly=[:cross_references],
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://michakraus.github.io/papers-spark-methods-for-degenerate-lagrangian-systems",
+        canonical="https://michakraus.github.io/paper-spark-methods-for-degenerate-lagrangian-systems",
         assets=String[],
     ),
     pages=[
