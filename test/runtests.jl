@@ -29,13 +29,18 @@ const vspark_tableaus = (
     tableaus_vspark_symmetric_projection(),
 )
 
+# A `DomainError` is a legitimate outcome for these degenerate Lagrangians – a stage value
+# may leave the domain of the logarithm – and is tolerated; every other exception propagates
+# and fails the test. The suite runs the diverging methods on purpose and only asks whether
+# they raise, so `verbosity = 0` keeps the line search from reporting its failures here.
 function test_tableaus(problem, tableaus)
     for list in tableaus
         for run in list
             method = run[1]
             @test begin
                 try
-                    integrate(problem, method; f_abstol = 1E-14, f_reltol = 1E-14, max_iterations = 100)
+                    integrate(problem, method; f_abstol = 1E-14, f_reltol = 1E-14,
+                                               max_iterations = 100, verbosity = 0)
                 catch ex
                     isa(ex, DomainError) || rethrow(ex)
                 end
