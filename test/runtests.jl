@@ -40,7 +40,7 @@ function test_tableaus(problem, tableaus)
             @test begin
                 try
                     integrate(problem, method; f_abstol = 1E-14, f_reltol = 1E-14,
-                                               max_iterations = 100, verbosity = 0)
+                                               verbosity = 0)
                 catch ex
                     isa(ex, DomainError) || rethrow(ex)
                 end

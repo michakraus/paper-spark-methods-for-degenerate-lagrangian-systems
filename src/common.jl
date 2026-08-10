@@ -84,9 +84,14 @@ end
 # discard the run: we keep the solution and stages up to the last successful step.
 # Returns `(sol, stages, last_good, err)` where `last_good` is the index of the last
 # completed step and `err` is `nothing`, `:nan`, or the caught exception.
+#
+# No iteration cap is imposed on the solver: a non-convergent solve is bounded by the
+# stagnation detector of `SimpleSolvers`, which gives up after two consecutive steps that
+# leave the iterate unmoved while the residual is still large. `warn_iterations = 0` drops
+# the bare iteration-count warning, the one solver message that `verbosity` does not gate.
 function integrate_spark(idae, method)
     int     = GIB.GeometricIntegrator(idae, method; f_abstol=1E-14, f_reltol=1E-14,
-                                      max_iterations=100, verbosity=SOLVER_VERBOSITY[])
+                                      verbosity=SOLVER_VERBOSITY[], warn_iterations=0)
     sol     = GIB.Solution(idae)
     solstep = GIB.solutionstep(int, sol[0])
     state   = GIB.current(solstep)
@@ -200,11 +205,10 @@ function write_symplecticity(method, dir, file, name)
 end
 
 
-# Reference a figure, but only if it was actually produced: a run that crashed early has
-# no energy drift data, and one that crashed on the very first step has no figures at
-# all. Referencing them regardless leaves broken images on the page and one
-# `invalid local link/image` warning per figure in the Documenter build. Returns whether
-# the reference was written.
+# Reference a figure, but only if it was actually produced: a run that crashed early has no
+# energy drift data, and one that crashed on the very first step has no figures at all.
+# Referencing them regardless leaves broken images on the page and one `invalid local
+# link/image` warning per figure in the Documenter build. Returns whether it wrote one.
 function _plot_figure_md(file, name, filename)
     isfile(filename) || return false
 
@@ -272,11 +276,10 @@ function _plot(sol, stages, equ, dir, file, fig_suff, last_good)
     _save_plot(() -> plot_energy_error(sol; latex=false, nt=ntplot), dir, file, "_energy_error", fig_suff)
 
     # Drift is an interval-based diagnostic: `plot_energy_drift` splits the solution into ten
-    # intervals and its `nt` counts those intervals, not time steps. Show only the intervals
-    # completed before a crash – and skip the plot unless at least two of them were
-    # completed, as a single point has no drift to show and a degenerate x-range throws.
-    # Solutions shorter than ten steps have no intervals at all and make the recipe itself
-    # divide by zero, so they are skipped outright (short runs only happen in local tests).
+    # intervals and its `nt` counts those, not time steps. Show only the intervals completed
+    # before a crash, and skip the plot below two of them: a single point has no drift to
+    # show and its degenerate x-range throws. Solutions shorter than ten steps have no
+    # intervals at all and make the recipe divide by zero (which happens in local tests only).
     interval = max(div(nt, 10), 1)
     ntdrift  = last_good ≥ nt ? (:auto) : div(last_good, interval)
 
@@ -365,9 +368,9 @@ function run_list(idae, name, list, plot_dir = PLOT_DIR, symp_dir = SYMP_DIR;
         overview = "$plot_dir/$file$fig_suff"
         isfile(overview) && show(stdout, "text/markdown", Markdown.parse("![$name]($overview)"))
 
-        # Each run leaves some thirty Makie figures and a full set of stage data series
-        # behind; collecting them here keeps the peak footprint of a list of up to fifty
-        # methods within what a CI runner can hold.
+        # Each run leaves a couple of dozen Makie figures and a full set of stage data
+        # series behind; collecting them here keeps the peak footprint of a whole method
+        # family within what a CI runner can hold.
         GC.gc()
     end
 
