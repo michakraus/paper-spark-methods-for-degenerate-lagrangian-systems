@@ -14,6 +14,15 @@ using SimpleSolvers: NonlinearSolverException
 using GeometricProblems.Diagnostics: plot_energy_error, plot_energy_drift,
                                      plot_constraint_error, plot_lagrange_multiplier
 
+using PoincareInvariants
+
+
+# Number of points at which the loop and the surface of the Poincaré invariants are sampled.
+# `FirstFourierPlan` takes any number of loop points; the surface's `SecondChebyshevPlan` samples
+# at Padua points and rounds the count up to the next Padua number, of which 231 = 21·22/2 is one.
+const NLOOP = 200
+const NSURFACE = 231
+
 
 # Shared Makie plotting style (kept identical to the SRK companion package). Larger
 # fonts and thicker lines than the Makie defaults, tuned for the fixed figure sizes of
@@ -146,6 +155,48 @@ function integrate_spark(idae, method)
     end
 
     (sol, (Qi=Qi, Pi=Pi, Vi=Vi, Φi=Φi, Qp=Qp, Pp=Pp, Λp=Λp, Φp=Φp), last_good, err)
+end
+
+
+# Integrate an IDAE step by step *without* recording the stage variables, for the Poincaré
+# invariants below. `integrate_spark` keeps eight `DataSeries` of stages per run, which is what the
+# per-run diagnostics need and what an ensemble of a few hundred members cannot afford. Otherwise
+# identical to it, down to the partial-result contract: a crash keeps the solution up to the last
+# successful time step, and the steps after it are padded with the last good state.
+function integrate_partial(idae, method)
+    int     = GIB.GeometricIntegrator(idae, method; f_abstol=1E-14, f_reltol=1E-14,
+                                      verbosity=SOLVER_VERBOSITY[], warn_iterations=0)
+    sol     = GIB.Solution(idae)
+    solstep = GIB.solutionstep(int, sol[0])
+    state   = GIB.current(solstep)
+    nt      = GIB.ntime(sol)
+
+    last_good = 0
+    err = nothing
+
+    try
+        for n in 1:nt
+            GIB.reset!(solstep, GIB.timesteps(sol)[n])
+            GIB.integrate!(solstep, int)
+
+            if isnan(state)
+                err = :nan
+                break
+            end
+
+            copy!(sol, state, n)
+            last_good = n
+        end
+    catch ex
+        err = ex
+    end
+
+    for n in (last_good+1):nt
+        sol.q[n] = copy(sol.q[last_good])
+        sol.p[n] = copy(sol.p[last_good])
+    end
+
+    (sol, last_good, err)
 end
 
 
@@ -376,6 +427,145 @@ function run_list(idae, name, list, plot_dir = PLOT_DIR, symp_dir = SYMP_DIR;
 
     if QUIET_LOG_COUNT[] > 0
         @info("Suppressed $(QUIET_LOG_COUNT[]) plotting warnings so far (see QUIET_LOG_MODULES)")
+    end
+
+    nothing
+end
+
+
+# The ensemble of trajectories that advects the sampled loop or surface.
+#
+# `PoincareInvariants.PIEnsembleProblem`, which the SRK and DVI companion packages use, covers
+# ODE/PODE/HODE/IODE/LODE only; it has no method for the index-2 DAEs the SPARK integrators solve.
+# Its IODE method cannot be reused either, because an `IDAE` initial condition also carries a
+# multiplier, whose dimension the equation alone does not determine — it is read off the problem's
+# own λ₀ here. Everything else is as upstream: the parameterisation is sampled at the points the
+# invariant's plan prescribes, and each member's momentum is seeded from the equation's own
+# one-form, which is what a degenerate Lagrangian needs — the momentum is not free, it is ϑ(q).
+function pi_ensemble(idae, pinv, init)
+    points = getpoints(init, pinv)
+    equ    = equation(idae)
+    t₀     = timespan(idae)[begin]
+    par    = parameters(idae)
+    nλ     = length(idae.ics.λ)
+
+    ics = map(axes(points, 1)) do i
+        q = collect(view(points, i, :))
+        p = zero(q)
+        v = zero(q)
+        equ.ϑ(p, t₀, q, v, par)
+        (q = q, p = p, λ = zeros(eltype(q), nλ))
+    end
+
+    EnsembleProblem(equ, timespan(idae), timestep(idae), ics, par)
+end
+
+
+# Advect the sampled loop or surface and evaluate the Poincaré invariant along the way.
+#
+# The ensemble is integrated one member at a time through `integrate_partial` rather than with
+# `integrate(::EnsembleProblem, …)`: the methods studied here diverge on purpose, and a single
+# diverging member must cost only its own trajectory, not the whole figure. The result is
+# truncated to the first member that failed, so that no padded state enters the invariant.
+#
+# Returns `(ts, Is, last_good, nt)`, or `nothing` if not one member survived its first step.
+function invariant_error(pinv, idae, method, init)
+    ensemble = pi_ensemble(idae, pinv, init)
+
+    sols = Vector{Any}(undef, nsamples(ensemble))
+    last_good = typemax(Int)
+
+    for (i, prob) in enumerate(ensemble)
+        sols[i], lg, _ = integrate_partial(prob, method)
+        last_good = min(last_good, lg)
+    end
+
+    last_good ≥ 1 || return nothing
+
+    # `compute!` takes one trajectory per sample point, each a vector of phase space points. These
+    # Lagrangians are degenerate, so the loop and the surface live in the two-dimensional
+    # configuration space alone and only `q` enters; neither the momentum nor the multiplier does.
+    ts = [sols[begin].t[n] for n in 0:last_good]
+    trajectories = [[sol.q[n] for n in 0:last_good] for sol in sols]
+
+    (ts, compute!(pinv, trajectories, ts, parameters(idae)), last_good, ntime(sols[begin]))
+end
+
+
+# Relative error of a Poincaré invariant over time, in the style of
+# `PoincareInvariants.plot_invariant`: linear axes, scatter, dashed zero line. That function
+# cannot be used directly, as it takes an `EnsembleSolution`, which the per-member integration
+# above deliberately does not build.
+function plot_invariant_error(ts, Is, symbol, title)
+    fig = Figure()
+    ax  = Axis(fig[1, 1]; xlabel = "t", title = title,
+               ylabel = "Relative Error ($(symbol)(t)-$(symbol)(0))/$(symbol)(0)")
+
+    hlines!(ax, [0.0]; color = :gray, linestyle = :dash)
+    scatter!(ax, ts, (Is .- Is[begin]) ./ Is[begin])
+    xlims!(ax, first(ts), last(ts))
+
+    fig
+end
+
+
+# The first and second Poincaré invariant of every method in `list`, over the same time step as
+# the trajectory diagnostics of `run_list` but a much shorter time interval: one run advects a
+# few hundred trajectories instead of one, so the time span is set by the problem module's
+# `nt_poincare` rather than its `nt`.
+#
+# `spec` is a named tuple `(loop, surface, first, second)` of the problem's phase space
+# parameterisations and invariant constructors, all four supplied by GeometricProblems, and bound
+# by the problem modules in `src/<problem>.jl`.
+function run_poincare(spec, idae, name, list, plot_dir = PLOT_DIR;
+                        fig_suff = ".png", nloop = NLOOP, nsurface = NSURFACE)
+
+    isdir(plot_dir) || mkpath(plot_dir)
+
+    # One invariant object for the whole list: it depends on the problem's one- or two-form and on
+    # the number of sample points only, not on the method that advects those points.
+    invariants = (("_poincare_1st", "I₁", spec.first(nloop),     spec.loop),
+                  ("_poincare_2nd", "I₂", spec.second(nsurface), spec.surface))
+
+    for run in list
+        method = run[1]
+        file   = run[2]
+
+        headline = tableau(method).name
+
+        # One level below the `### Poincaré Invariants` heading the page puts above this call,
+        # which in turn sits beside the `###` sections `run_list` writes for the same methods.
+        show(stdout, "text/markdown", Markdown.parse("#### $(headline)"))
+        _linebreak(stdout)
+
+        for (suffix, symbol, pinv, init) in invariants
+            result = invariant_error(pinv, idae, method, init)
+
+            if result === nothing
+                show(stdout, "text/markdown",
+                     Markdown.parse("**No $(symbol): the ensemble crashed on its first time step.**"))
+                _linebreak(stdout)
+                continue
+            end
+
+            ts, Is, last_good, nt = result
+
+            if last_good < nt
+                show(stdout, "text/markdown",
+                     Markdown.parse("**$(symbol) shown over the first $(last_good) of $(nt) time steps: " *
+                                    "at least one member of the ensemble crashed.**"))
+                _linebreak(stdout)
+            end
+
+            _save_plot(() -> plot_invariant_error(ts, Is, symbol, string(headline)),
+                       plot_dir, file, suffix, fig_suff)
+
+            _plot_figure_md(stdout, name, "$plot_dir/$file$suffix$fig_suff")
+        end
+
+        # One ensemble of a few hundred solutions per method, plus two figures; collecting them
+        # here keeps the peak footprint within what a CI runner can hold.
+        GC.gc()
     end
 
     nothing

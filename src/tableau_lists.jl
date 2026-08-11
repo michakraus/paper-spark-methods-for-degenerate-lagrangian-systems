@@ -231,3 +231,62 @@ end
 function run_list_vspark_symmetric_projection(idae)
     run_list(idae, :TableauVSPARKSymmetricProjection, tableaus_vspark_symmetric_projection())
 end
+
+
+
+# The Poincaré invariants of the same method families. One wrapper per `run_list_*` above, taking
+# the same method list and the same name but the invariant diagnostics of `common.jl` instead of
+# the trajectory ones, and the problem's `PI_SPEC` — the phase space parameterisations and
+# invariant constructors bound by the problem module in `src/<problem>.jl`, which is what
+# `common.jl` and this file are included into.
+#
+# `phi_average` has no counterpart here: it averages the projection constraint over the stages of
+# a single run, which the invariants do not look at.
+
+function run_poincare_spark_glvprk(idae)
+    run_poincare(PI_SPEC, idae, :TableauSPARKGLVPRK, tableaus_spark_glvprk())
+end
+
+function run_poincare_spark_glrk(idae)
+    run_poincare(PI_SPEC, idae, :TableauSPARKGLRK, tableaus_spark_glrk())
+end
+
+function run_poincare_spark_lobatto(idae)
+    run_poincare(PI_SPEC, idae, :TableauSPARKLobatto, tableaus_spark_lobatto())
+end
+
+function run_poincare_vspark_internal_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKInternalProjection, tableaus_vspark_internal_projection())
+end
+
+function run_poincare_vspark_modified_internal_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKModifiedInternalProjection, tableaus_vspark_modified_internal_projection())
+end
+
+function run_poincare_vspark_lobatto_IIIAIIIB_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKLobattoIIIAIIIBProjection, tableaus_vspark_lobatto_IIIAIIIB_projection())
+end
+
+function run_poincare_vspark_lobatto_IIIBIIIA_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKLobattoIIIBIIIAProjection, tableaus_vspark_lobatto_IIIBIIIA_projection())
+end
+
+function run_poincare_vspark_modified_lobatto_IIIAIIIB_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKModifiedLobattoIIIAIIIBProjection, tableaus_vspark_modified_lobatto_IIIAIIIB_projection())
+end
+
+function run_poincare_vspark_modified_lobatto_IIIBIIIA_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKModifiedLobattoIIIBIIIAProjection, tableaus_vspark_modified_lobatto_IIIBIIIA_projection())
+end
+
+function run_poincare_vspark_midpoint_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKMidpointProjection, tableaus_vspark_midpoint_projection())
+end
+
+function run_poincare_vspark_modified_midpoint_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKModifiedMidpointProjection, tableaus_vspark_modified_midpoint_projection())
+end
+
+function run_poincare_vspark_symmetric_projection(idae)
+    run_poincare(PI_SPEC, idae, :TableauVSPARKSymmetricProjection, tableaus_vspark_symmetric_projection())
+end

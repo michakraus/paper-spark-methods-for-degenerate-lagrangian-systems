@@ -3,6 +3,10 @@ module MasslessChargedParticleSPARK
     const Δt = 0.1
     const nt = 100000
 
+    # The Poincaré invariants advect a few hundred trajectories per method instead of one, so they
+    # run over a correspondingly shorter time interval — at the same time step.
+    const nt_poincare = 1000
+
     const PLOT_DIR = "figures"
     const SYMP_DIR = "symplecticity"
 
@@ -10,6 +14,15 @@ module MasslessChargedParticleSPARK
 
     using GeometricProblems.MasslessChargedParticle
     using GeometricProblems.MasslessChargedParticle: plot_solution, plot_phase_portrait, plot_traces
+
+    # Phase space parameterisations and invariant constructors, all supplied by GeometricProblems:
+    # `f_loop`/`f_surface` are the curve and the surface the invariants are taken over,
+    # `poincare_invariant_1st`/`_2nd` build them over this gauge's own one- and two-form. Read by
+    # the `run_poincare_*` wrappers of `tableau_lists.jl`.
+    const PI_SPEC = (loop    = MasslessChargedParticle.f_loop,
+                     surface = MasslessChargedParticle.f_surface,
+                     first   = MasslessChargedParticle.poincare_invariant_1st,
+                     second  = MasslessChargedParticle.poincare_invariant_2nd)
 
     include("common.jl")
     include("tableau_lists.jl")
