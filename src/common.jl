@@ -130,8 +130,46 @@ end
 #
 # No iteration cap is imposed on the solver: a non-convergent solve is bounded by the
 # stagnation detector of `SimpleSolvers`, which gives up after two consecutive steps that
-# leave the iterate unmoved while the residual is still large. `warn_iterations = 0` drops
-# the bare iteration-count warning, the one solver message that `verbosity` does not gate.
+# leave the iterate unmoved while the residual is still large, and — since
+# `GeometricIntegratorsBase` 0.6 — by its `f_stall_window = 50`, which gives up on a solve that
+# spends fifty iterations without halving its residual. `warn_iterations = 0` drops the bare
+# iteration-count warning, the one solver message that `verbosity` does not gate.
+#
+# `f_stall_window` changes nothing here: measured over all 108 runs at the pages' own Δt = 0.1,
+# not one step count or failure mode differs between `f_stall_window = 50` and `0`. (It does
+# move one run of the SRK companion package and two of the DVI one.)
+#
+# What *does* change these pages is SimpleSolvers 0.11, and it is worth knowing before the
+# figures are compared with the published ones: **eleven VSPARK runs on the singular gauge that
+# used to crash now integrate to the end.** Old step count → new, the latter over the full 100000
+# steps these pages run:
+#
+#   vspark_pLobattoIIIAIIIB_lobIIIBA3     48 steps, solver error   → completes
+#   vspark_pLobattoIIIAIIIB_lobIIIBA5   3300 steps, singular matrix→ completes
+#   vspark_pLobattoIIIBIIIA_lobIIIBA3      0 steps, NaNs           → completes
+#   vspark_pLobattoIIIBIIIA_lobIIIBA5     10 steps, NaNs           → completes
+#   vspark_pMidpoint_lobIIIBA3             3 steps, NaNs           → completes
+#   vspark_pMidpoint_lobIIIBA5             4 steps, NaNs           → completes
+#   vspark_pModifiedMidpoint_lobIIIBA3     3 steps, NaNs           → completes
+#   vspark_pModifiedMidpoint_lobIIIBA5     4 steps, NaNs           → completes
+#   vspark_pSymmetric_lobIIIAB3          607 steps, solver error   → completes
+#   vspark_pSymmetric_lobIIIBA3           10 steps, solver error   → completes
+#   vspark_pSymmetric_lobIIIBA5           38 steps, solver error   → completes
+#
+# Only `vspark_p{Midpoint,ModifiedMidpoint}_lobIIIAB2` still stop early, at 276 steps, as before.
+# The new trajectories are sound rather than merely non-NaN: over the whole 100000 steps they hold
+# the energy to 4.2E-11 at five stages and 1.4E-5 at three (2.5E-4 for `pSymmetric_lobIIIAB3`),
+# which is the order of the method, and each takes 6–14 s.
+#
+# The cause is SimpleSolvers' own bug fix (JuliaGNI/SimpleSolvers.jl#130), not anything about the
+# methods. Through 0.10.1 the nonlinear solvers tested for `NaN` where they should have tested
+# for any non-finite value, so an *overflowed* residual passed every guard they had and could be
+# reported as **convergence** — the bad iterate was then accepted and took the state with it a
+# step or two later. This was pinned down by elimination: the VPRK and VSPARK tableaus, the
+# Lobatto coefficients and the nullvectors are all bit-identical across the two stacks (the
+# nullvector sign that RungeKutta 0.6 flipped is at s = 2 and s = 4, whereas the runs that moved
+# are s = 3 and s = 5), and holding GeometricIntegrators at 0.17 while raising
+# GeometricIntegratorsBase to 0.5.3 reproduces the old failures exactly.
 function integrate_spark(idae, method)
     int     = GIB.GeometricIntegrator(idae, method; f_abstol=1E-14, f_reltol=1E-14,
                                       verbosity=SOLVER_VERBOSITY[], warn_iterations=0)
