@@ -19,7 +19,8 @@ This packages serves to document the examples from the paper *SPARK Methods for 
 * [Gauss-Legendre SPARK Methods](lotka-volterra-2d/lotka-volterra-2d-spark-glspark.md)
 * [Gauss-Lobatto SPARK Methods](lotka-volterra-2d/lotka-volterra-2d-spark-lobspark.md)
 * [Internal Stage Projection](lotka-volterra-2d/lotka-volterra-2d-spark-pinternal.md)
-* [Lobatto-IIIA-IIIB Projection](lotka-volterra-2d/lotka-volterra-2d-spark-plobatto.md)
+* [Lobatto Projections • Definition 1](lotka-volterra-2d/lotka-volterra-2d-spark-plobatto1.md)
+* [Lobatto Projections • Definition 2](lotka-volterra-2d/lotka-volterra-2d-spark-plobatto2.md)
 * [Midpoint Projection](lotka-volterra-2d/lotka-volterra-2d-spark-pmidpoint.md)
 * [Symmetric Projection](lotka-volterra-2d/lotka-volterra-2d-spark-psymmetric.md)
 
@@ -29,7 +30,8 @@ This packages serves to document the examples from the paper *SPARK Methods for 
 * [Gauss-Legendre SPARK Methods](massless-charged-particle/massless-charged-particle-spark-glspark.md)
 * [Gauss-Lobatto SPARK Methods](massless-charged-particle/massless-charged-particle-spark-lobspark.md)
 * [Internal Stage Projection](massless-charged-particle/massless-charged-particle-spark-pinternal.md)
-* [Lobatto-IIIA-IIIB Projection](massless-charged-particle/massless-charged-particle-spark-plobatto.md)
+* [Lobatto Projections • Definition 1](massless-charged-particle/massless-charged-particle-spark-plobatto1.md)
+* [Lobatto Projections • Definition 2](massless-charged-particle/massless-charged-particle-spark-plobatto2.md)
 * [Midpoint Projection](massless-charged-particle/massless-charged-particle-spark-pmidpoint.md)
 * [Symmetric Projection](massless-charged-particle/massless-charged-particle-spark-psymmetric.md)
 

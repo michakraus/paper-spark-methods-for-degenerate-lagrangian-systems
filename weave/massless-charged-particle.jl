@@ -36,7 +36,12 @@ weave("weave/massless-charged-particle-spark-psymmetric.jmd",
          doctype = "github",
          mod = MasslessChargedParticleSPARK)
 
-weave("weave/massless-charged-particle-spark-plobatto.jmd",
+weave("weave/massless-charged-particle-spark-plobatto1.jmd",
+         out_path = "build/massless-charged-particle-spark",
+         doctype = "github",
+         mod = MasslessChargedParticleSPARK)
+
+weave("weave/massless-charged-particle-spark-plobatto2.jmd",
          out_path = "build/massless-charged-particle-spark",
          doctype = "github",
          mod = MasslessChargedParticleSPARK)

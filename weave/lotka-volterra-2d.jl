@@ -36,7 +36,12 @@ weave("weave/lotka-volterra-2d-spark-psymmetric.jmd",
          doctype = "github",
          mod = LotkaVolterra2dSingularSPARK)
 
-weave("weave/lotka-volterra-2d-spark-plobatto.jmd",
+weave("weave/lotka-volterra-2d-spark-plobatto1.jmd",
+         out_path = "build/lotka-volterra-2d-spark",
+         doctype = "github",
+         mod = LotkaVolterra2dSingularSPARK)
+
+weave("weave/lotka-volterra-2d-spark-plobatto2.jmd",
          out_path = "build/lotka-volterra-2d-spark",
          doctype = "github",
          mod = LotkaVolterra2dSingularSPARK)

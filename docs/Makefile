@@ -6,7 +6,8 @@ PAGES = glvprk \
         glspark \
         lobspark \
         pinternal \
-        plobatto \
+        plobatto1 \
+        plobatto2 \
         pmidpoint \
         psymmetric
 

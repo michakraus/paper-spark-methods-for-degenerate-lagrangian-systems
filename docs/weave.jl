@@ -9,7 +9,7 @@
 # Examples:
 #
 #   julia --project=.. weave.jl lotka-volterra-2d
-#   julia --project=.. weave.jl lotka-volterra-2d plobatto psymmetric
+#   julia --project=.. weave.jl lotka-volterra-2d plobatto1 psymmetric
 #
 # One page per process, rather than one process for all seven pages of a problem: the full
 # build runs 216 simulations over 100000 time steps each and writes some 2900 figures,
@@ -27,7 +27,14 @@ const PROBLEMS = (
 )
 
 # page name → `weave/<problem>-spark-<page>.jmd`
-const PAGES = ("glvprk", "glspark", "lobspark", "pinternal", "plobatto", "pmidpoint", "psymmetric")
+#
+# The two Lobatto-projection definitions are separate pages rather than one `plobatto`, because
+# together they no longer fit a hosted runner: SimpleSolvers 0.11 rescued eleven of these runs
+# (see `integrate_spark` in src/common.jl), so where they used to crash within a few steps they
+# now integrate all 100000 and advect the full Poincaré ensembles. The combined page took 32 min
+# before that and lost its runner to "communication with the server" at 101 min after.
+const PAGES = ("glvprk", "glspark", "lobspark", "pinternal", "plobatto1", "plobatto2",
+               "pmidpoint", "psymmetric")
 
 source_path(problem, page) = joinpath(@__DIR__, "..", "weave", "$(problem)-spark-$(page).jmd")
 

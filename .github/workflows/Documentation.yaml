@@ -41,7 +41,14 @@ jobs:
           - glspark
           - lobspark
           - pinternal
-          - plobatto
+          # The two Lobatto-projection definitions are one job each. As a single `plobatto` page
+          # they took 32 min until SimpleSolvers 0.11 rescued eleven of their runs, after which
+          # the massless-charged-particle job lost its runner to "The hosted runner lost
+          # communication with the server" at 101 min — under the timeout below, so it is the
+          # runner's CPU/memory that the page outgrew, not the budget. See `PAGES` in
+          # docs/weave.jl.
+          - plobatto1
+          - plobatto2
           - pmidpoint
           - psymmetric
     steps:
