@@ -19,14 +19,3 @@
   ```
 - **Kind:** missing test
 - **Found:** 2026-09-27
-
-### K2 · `[sources]` in `test/Project.toml` is unverified on Julia 1.10
-
-- **Location:** `test/Project.toml`
-- **Evidence:** Julia 1.10 ignores `[sources]`. `Pkg.test` still adds the package under test, so the
-  entry is expected to be harmless there. RungeKutta has the same form in `test/Project.toml` and a
-  Julia floor of 1.10, and its three `Julia min` jobs pass in CI run 36240608082 at commit
-  `36cc803`. This repository's suite has no run on Julia 1.10; the `1.10` jobs of
-  `.github/workflows/CI.yml` decide it.
-- **Kind:** not verified
-- **Found:** 2026-09-27
