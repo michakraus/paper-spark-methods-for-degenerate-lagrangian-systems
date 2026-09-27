@@ -11,7 +11,7 @@ PAGES = glvprk \
         pmidpoint \
         psymmetric
 
-# One target per woven page, mirroring the matrix of .github/workflows/Documentation.yaml:
+# One target per woven page, mirroring the matrix of .github/workflows/Documenter.yml:
 # `make -j8 weave` reproduces its fan-out and `make -k` its `fail-fast: false`, so that a
 # crashing integrator does not cost us the remaining pages. One Julia process per page is
 # not optional here — see the comment at the top of weave.jl.
