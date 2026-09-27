@@ -24,7 +24,7 @@ Documenter = "1"
 # into whatever `integrate_spark` passes; see the note above that function in `src/common.jl`.
 GeometricIntegrators = "0.18"
 GeometricIntegratorsBase = "0.6"
-GeometricProblems = "0.8.3"
+GeometricProblems = "0.8.3, 0.9"
 Latexify = "0.16"
 Logging = "1"
 Markdown = "1"
