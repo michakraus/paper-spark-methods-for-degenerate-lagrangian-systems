@@ -24,6 +24,12 @@ failure this prevents.
 
 ### Changed
 
+- **Two `[compat]` floors rise so that every floor resolves together on Julia 1.10.**
+  GeometricIntegrators is `"0.18.1"`, in `Project.toml` and `test/Project.toml`: 0.18.0 requires
+  GeometricIntegratorsBase 0.5 and SimpleSolvers 0.10, below the floors 0.6 and 0.11. Weave is
+  `"0.10.11"`: up to 0.10.10 it caps Highlights at 0.4, and so DocStringExtensions at 0.8, while
+  GeometricProblems 0.8.3 needs DocStringExtensions 0.9 through Symbolics 7. Compat-only; no
+  behaviour changes.
 - **CI runs the shared workflow of the other experiment and package repositories.** The test matrix
   is Julia `min` (the `[compat] julia` floor, 1.10) and `1` on Linux, macOS and Windows, with
   `pre` and `nightly` as advisory jobs. The pinned `1.10` gives way to `min`, and the job names
