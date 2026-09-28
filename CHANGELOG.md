@@ -16,7 +16,11 @@ failure this prevents.
 
 - **Coverage is uploaded to Codecov** from the `min` Linux job; there was no coverage before.
   `codecov.yml` sets the project and patch checks to a 1 % threshold.
-- **Dependabot opens the `[compat]` bumps**, weekly, and ignores the standard libraries.
+- **Dependabot opens the `[compat]` bumps**, weekly, for the root `Project.toml` only, and ignores
+  the standard libraries.
+- **An advisory `Downgrade - ubuntu-latest` job tests the `[compat]` lower bounds.** It resolves
+  each direct dependency of the root `Project.toml` to its lower bound on the lowest Julia and runs
+  the suite there. It is not a required check.
 
 ### Changed
 
