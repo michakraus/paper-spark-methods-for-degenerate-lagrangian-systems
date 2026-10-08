@@ -32,9 +32,9 @@ failure this prevents.
   GeometricProblems 0.9.1, PoincareInvariants 0.5.1 and SimpleSolvers 0.14.1**, because
   GeometricBase 0.15 declares its stubs public and requires Julia 1.11.
 - **The Weave floor is `"0.10.11"`**, in `Project.toml`: up to 0.10.10 Weave caps Highlights at 0.4,
-  and so DocStringExtensions at 0.8, while GeometricProblems 0.8.3 needs DocStringExtensions 0.9
-  through Symbolics 7, so the floors did not resolve together on Julia 1.10. Compat-only; no
-  behaviour changes.
+  and so DocStringExtensions at 0.8, while GeometricProblems 0.9.1 needs DocStringExtensions 0.9
+  through EulerLagrange 0.5.2 and Symbolics 7, so the floors do not resolve together. Compat-only;
+  no behaviour changes.
 - **CI runs the shared workflow of the other experiment and package repositories.** The test matrix
   is Julia `min` (the `[compat] julia` floor, 1.11) and `1` on Linux, macOS and Windows, with
   `pre` and `nightly` as advisory jobs. The pinned `1.10` gives way to `min`, and the job names
