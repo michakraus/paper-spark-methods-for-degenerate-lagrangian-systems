@@ -28,14 +28,15 @@ failure this prevents.
 - **`test/Project.toml` no longer repeats the root's `[compat]` bounds.** Its `GeometricIntegrators`
   and `GeometricProblems` entries are removed: a dependency of the root `Project.toml` takes its
   bound from the root only, so the test environment resolves exactly what users resolve.
-- **Two `[compat]` floors rise so that every floor resolves together on Julia 1.10.**
-  GeometricIntegrators is `"0.18.1"`, in `Project.toml`: 0.18.0 requires
-  GeometricIntegratorsBase 0.5 and SimpleSolvers 0.10, below the floors 0.6 and 0.11. Weave is
-  `"0.10.11"`: up to 0.10.10 it caps Highlights at 0.4, and so DocStringExtensions at 0.8, while
-  GeometricProblems 0.8.3 needs DocStringExtensions 0.9 through Symbolics 7. Compat-only; no
-  behaviour changes.
+- **The floors rise to Julia 1.11, GeometricIntegrators 0.18.6, GeometricIntegratorsBase 0.6.9,
+  GeometricProblems 0.9.1, PoincareInvariants 0.5.1 and SimpleSolvers 0.14.1**, because
+  GeometricBase 0.15 declares its stubs public and requires Julia 1.11.
+- **The Weave floor is `"0.10.11"`**, in `Project.toml`: up to 0.10.10 Weave caps Highlights at 0.4,
+  and so DocStringExtensions at 0.8, while GeometricProblems 0.9.1 needs DocStringExtensions 0.9
+  through EulerLagrange 0.5.2 and Symbolics 7, so the floors do not resolve together. Compat-only;
+  no behaviour changes.
 - **CI runs the shared workflow of the other experiment and package repositories.** The test matrix
-  is Julia `min` (the `[compat] julia` floor, 1.10) and `1` on Linux, macOS and Windows, with
+  is Julia `min` (the `[compat] julia` floor, 1.11) and `1` on Linux, macOS and Windows, with
   `pre` and `nightly` as advisory jobs. The pinned `1.10` gives way to `min`, and the job names
   change with it, so the required checks of branch protection can be one fixed list across all
   repositories. The test job's timeout is 120 minutes, where it was 60. A new
