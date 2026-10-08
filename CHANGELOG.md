@@ -14,7 +14,7 @@ failure this prevents.
 
 ### Added
 
-- **Coverage is uploaded to Codecov** from the `min` Linux job; there was no coverage before.
+- **Coverage is uploaded to Codecov** from the `1` Linux job; there was no coverage before.
   `codecov.yml` sets the project and patch checks to a 1 % threshold.
 - **Dependabot opens the `[compat]` bumps**, weekly, for the root `Project.toml` only, and ignores
   the standard libraries.
@@ -24,8 +24,7 @@ failure this prevents.
 
 ### Changed
 
-- **CI uploads coverage from the `Julia 1 - ubuntu-latest` job instead of `Julia min`**, and a test
-  job saves the Julia cache only when it succeeds.
+- **A CI test job saves the Julia cache only when it succeeds.**
 - **`test/Project.toml` no longer repeats the root's `[compat]` bounds.** Its `GeometricIntegrators`
   and `GeometricProblems` entries are removed: a dependency of the root `Project.toml` takes its
   bound from the root only, so the test environment resolves exactly what users resolve.
