@@ -36,12 +36,18 @@ failure this prevents.
   through EulerLagrange 0.5.2 and Symbolics 7, so the floors do not resolve together. Compat-only;
   no behaviour changes.
 - **CI runs the shared workflow of the other experiment and package repositories.** The test matrix
-  is Julia `min` (the `[compat] julia` floor, 1.11) and `1` on Linux, macOS and Windows, with
+  is Julia `min` (the `[compat] julia` floor, 1.12) and `1` on Linux, macOS and Windows, with
   `pre` and `nightly` as advisory jobs. The pinned `1.10` gives way to `min`, and the job names
   change with it, so the required checks of branch protection can be one fixed list across all
   repositories. The test job's timeout is 120 minutes, where it was 60. A new
   `Doctests - ubuntu-latest` job skips itself here, because the repository has no
   `docs/Project.toml`.
+- **Julia 1.12 is the floor** (`[compat] julia = "1.12"`, from 1.11). A caller on Julia 1.11 can
+  no longer install this version. Nothing in `src/` changes. The Aqua persistent-tasks check in
+  `test/quality/aqua.jl` no longer raises `tmax` to 300 s: on 1.12 the check takes 25 to 28 s
+  against Aqua's default of 30 s, measured twice in one process on a loaded machine. The
+  `Project.toml` comment on the three pinned releases stays: it names the Julia floor of those
+  releases, which 1.12 still satisfies.
 - **The documentation workflow is `Documenter.yml`**, formerly `Documentation.yaml`. The weave
   pipeline is unchanged; only the action versions move to the current majors. The comment in
   `docs/Makefile` names the new file.
