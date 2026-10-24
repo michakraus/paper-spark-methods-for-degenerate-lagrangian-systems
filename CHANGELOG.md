@@ -28,7 +28,7 @@ failure this prevents.
 - **`test/Project.toml` no longer repeats the root's `[compat]` bounds.** Its `GeometricIntegrators`
   and `GeometricProblems` entries are removed: a dependency of the root `Project.toml` takes its
   bound from the root only, so the test environment resolves exactly what users resolve.
-- **The floors rise to Julia 1.11, GeometricIntegrators 0.18.6, GeometricIntegratorsBase 0.6.9,
+- **The dependency floors rise to GeometricIntegrators 0.18.6, GeometricIntegratorsBase 0.6.9,
   GeometricProblems 0.9.1, PoincareInvariants 0.5.1 and SimpleSolvers 0.14.1**, because
   GeometricBase 0.15 declares its stubs public and requires Julia 1.11.
 - **The Weave floor is `"0.10.11"`**, in `Project.toml`: up to 0.10.10 Weave caps Highlights at 0.4,
@@ -44,8 +44,10 @@ failure this prevents.
   `docs/Project.toml`.
 - **Julia 1.12 is the floor** (`[compat] julia = "1.12"`, from 1.11). A caller on Julia 1.11 can
   no longer install this version. Nothing in `src/` changes. The Aqua persistent-tasks check in
-  `test/quality/aqua.jl` no longer raises `tmax` to 300 s: on 1.12 the check takes 25 to 28 s
-  against Aqua's default of 30 s, measured twice in one process on a loaded machine. The
+  `test/quality/aqua.jl` no longer raises `tmax` to 300 s. Aqua's `tmax` bounds only the exit of
+  the precompilation process after the package has loaded, and on 1.12 that exit takes 0.7 to
+  1.1 s, both warm and on a compiled cache that holds nothing (four runs, load average 17 to 44).
+  The 25 to 28 s the check takes is the load before that exit, which no `tmax` covers. The
   `Project.toml` comment on the three pinned releases stays: it names the Julia floor of those
   releases, which 1.12 still satisfies.
 - **The documentation workflow is `Documenter.yml`**, formerly `Documentation.yaml`. The weave
