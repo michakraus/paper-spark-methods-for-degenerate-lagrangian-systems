@@ -21,6 +21,8 @@ failure this prevents.
 - **An advisory `Downgrade - ubuntu-latest` job tests the `[compat]` lower bounds.** It resolves
   each direct dependency of the root `Project.toml` to its lower bound on the lowest Julia and runs
   the suite there. It is not a required check.
+- **`.gitignore` ignores the `figures/` and `symplecticity/` directories** at any depth. A driver
+  run from the repository root writes its default output there, and no rule covered it.
 
 ### Changed
 
