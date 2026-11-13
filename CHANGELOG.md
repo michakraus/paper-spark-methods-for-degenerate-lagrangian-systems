@@ -30,9 +30,18 @@ failure this prevents.
 - **`test/Project.toml` no longer repeats the root's `[compat]` bounds.** Its `GeometricIntegrators`
   and `GeometricProblems` entries are removed: a dependency of the root `Project.toml` takes its
   bound from the root only, so the test environment resolves exactly what users resolve.
-- **The dependency floors rise to GeometricIntegrators 0.18.6, GeometricIntegratorsBase 0.6.9,
-  GeometricProblems 0.9.1, PoincareInvariants 0.5.1 and SimpleSolvers 0.14.1**, because
-  GeometricBase 0.15 declares its stubs public and requires Julia 1.11.
+- **The dependency bounds are GeometricIntegrators 0.19, GeometricIntegratorsBase 0.7,
+  GeometricProblems 0.10, PoincareInvariants 0.5.1 and SimpleSolvers 0.14.1.** The floors of
+  PoincareInvariants and SimpleSolvers are the releases that take GeometricBase 0.15, which
+  declares its stubs public and requires Julia 1.11. The other three are the latest releases.
+  Compat-only; nothing in `src/`, `test/`, `docs/` or `weave/` changes.
+  The breaking change of GeometricIntegrators 0.19 and GeometricIntegratorsBase 0.7 exchanges the
+  symplectic Euler letters A and B, and no method used here is a symplectic Euler method. The
+  breaking change of GeometricProblems 0.10 concerns `LinearWave` only, which is not used here.
+  GeometricIntegratorsBase 0.7 still merges `f_stall_window = 50` from `default_options` into the
+  options that `integrate_spark` passes, so the note above that function holds as written. The
+  `Project.toml` comment on the three coupled releases names the new coupling: GeometricIntegrators
+  0.19 requires GeometricIntegratorsBase 0.7, and both require SimpleSolvers 0.14.1.
 - **The Weave floor is `"0.10.11"`**, in `Project.toml`: up to 0.10.10 Weave caps Highlights at 0.4,
   and so DocStringExtensions at 0.8, while GeometricProblems 0.9.1 needs DocStringExtensions 0.9
   through EulerLagrange 0.5.2 and Symbolics 7, so the floors do not resolve together. Compat-only;
@@ -49,9 +58,7 @@ failure this prevents.
   `test/quality/aqua.jl` no longer raises `tmax` to 300 s. Aqua's `tmax` bounds only the exit of
   the precompilation process after the package has loaded, and on 1.12 that exit takes 0.7 to
   1.1 s, both warm and on a compiled cache that holds nothing (four runs, load average 17 to 44).
-  The 25 to 28 s the check takes is the load before that exit, which no `tmax` covers. The
-  `Project.toml` comment on the three pinned releases stays: it names the Julia floor of those
-  releases, which 1.12 still satisfies.
+  The 25 to 28 s the check takes is the load before that exit, which no `tmax` covers.
 - **The documentation workflow is `Documenter.yml`**, formerly `Documentation.yaml`. The weave
   pipeline is unchanged; only the action versions move to the current majors. The comment in
   `docs/Makefile` names the new file.
